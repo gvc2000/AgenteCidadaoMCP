@@ -9,7 +9,8 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc && chmod +x dist/server.js",
+    "build": "tsc",
+    "build:unix": "tsc && chmod +x dist/server.js",
     "start": "node dist/server.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage",

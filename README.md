@@ -1,4 +1,4 @@
-# MCP Câmara BR
+# 🏛️ MCP Câmara BR
 
 Servidor MCP (Model Context Protocol) completo para a API de Dados Abertos da Câmara dos Deputados do Brasil.
 
@@ -17,12 +17,62 @@ O **mcp-camara-br** é um servidor MCP que expõe todas as funcionalidades da AP
 - ✅ **Type-Safe** - 100% TypeScript
 - ✅ **Docker Ready** - Containerizado e pronto para deploy
 
+## 🚀 Início Rápido (5 minutos)
+
+### 1. Instalar dependências
+
+```bash
+npm install
+```
+
+### 2. Compilar
+
+```bash
+npm run build
+```
+
+### 3. Configurar no Claude Desktop
+
+Edite o arquivo de configuração:
+
+**macOS:**
+```bash
+~/Library/Application Support/Claude/claude_desktop_config.json
+```
+
+**Windows:**
+```bash
+%APPDATA%\Claude\claude_desktop_config.json
+```
+
+**Linux:**
+```bash
+~/.config/Claude/claude_desktop_config.json
+```
+
+Adicione:
+
+```json
+{
+  "mcpServers": {
+    "camara-br": {
+      "command": "node",
+      "args": ["/caminho/completo/para/AgenteCidadaoMCP/dist/server.js"]
+    }
+  }
+}
+```
+
+### 4. Reiniciar Claude Desktop
+
+Feche e abra o Claude Desktop novamente.
+
 ## Requisitos
 
 - Node.js >= 20.0.0
 - npm ou yarn
 
-## Instalação
+## Instalação Completa
 
 ```bash
 # Clonar o repositório
@@ -79,7 +129,7 @@ METRICS_ENABLED=true
 METRICS_PORT=9090
 ```
 
-## Tools Disponíveis
+## 🛠️ Tools Disponíveis
 
 ### Deputados
 
@@ -96,9 +146,15 @@ METRICS_PORT=9090
 - `detalhar_proposicao` - Informações detalhadas de uma proposição
 - `autores_proposicao` - Lista os autores de uma proposição
 
-## Exemplos de Uso
+## 💬 Exemplos de Uso
 
 ### Buscar Deputados de SP do PT
+
+```
+Liste deputados do estado de São Paulo no partido PT
+```
+
+Ou via JSON:
 
 ```json
 {
@@ -114,6 +170,12 @@ METRICS_PORT=9090
 
 ### Buscar Proposições sobre Educação
 
+```
+Busque projetos de lei sobre educação apresentados em 2024
+```
+
+Ou via JSON:
+
 ```json
 {
   "tool": "buscar_proposicoes",
@@ -127,6 +189,12 @@ METRICS_PORT=9090
 ```
 
 ### Despesas de um Deputado
+
+```
+Mostre as despesas do deputado ID 204554 em janeiro de 2024
+```
+
+Ou via JSON:
 
 ```json
 {
@@ -226,6 +294,13 @@ O servidor implementa várias otimizações:
 - **Request Queue**: Controla concorrência
 - **Retry Logic**: Exponential backoff com jitter
 
+## 📚 Documentação Completa
+
+- [Guia de Instalação e Uso](./GUIA_INSTALACAO_USO.md) - Documentação completa de instalação e configuração
+- [Início Rápido](./INICIO_RAPIDO.md) - Guia de 5 minutos para começar
+- [Exemplos Práticos](./EXEMPLOS_PRATICOS.md) - Exemplos de uso com LLMs
+- [Especificação Técnica](./mcp-camara-br-especificacao-completa.md) - Especificação completa do servidor
+
 ## Contribuindo
 
 Contribuições são bem-vindas! Por favor:
@@ -240,7 +315,7 @@ Contribuições são bem-vindas! Por favor:
 
 MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## Links
+## 🔗 Links
 
 - [API Dados Abertos da Câmara](https://dadosabertos.camara.leg.br/)
 - [Model Context Protocol](https://modelcontextprotocol.io/)

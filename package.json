@@ -4,9 +4,12 @@
   "description": "Servidor MCP completo para API da Câmara dos Deputados do Brasil",
   "type": "module",
   "main": "dist/server.js",
+  "bin": {
+    "mcp-camara-br": "./dist/server.js"
+  },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/server.js",
     "start": "node dist/server.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
@@ -20,10 +23,12 @@
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "camara",
     "brasil",
     "deputados",
     "legislativo",
+    "opendata",
     "api"
   ],
   "author": "",

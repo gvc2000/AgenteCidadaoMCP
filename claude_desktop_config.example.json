@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "camara-br": {
+      "command": "node",
+      "args": ["/CAMINHO/COMPLETO/PARA/AgenteCidadaoMCP/dist/server.js"]
+    }
+  }
+}

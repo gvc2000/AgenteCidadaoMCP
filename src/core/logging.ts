@@ -2,9 +2,11 @@ import pino from 'pino';
 import { CONFIG } from '../config.js';
 
 // @ts-ignore - pino has complex types
+// IMPORTANTE: Logs devem ir para stderr, não stdout
+// O stdout é reservado para mensagens JSON-RPC do protocolo MCP
 export const logger = pino({
   level: CONFIG.logging.level
-});
+}, pino.destination({ dest: 2 })); // 2 = stderr
 
 // Helper para logs estruturados
 export function logToolCall(toolName: string, params: unknown, duration?: number) {

@@ -1,0 +1,40 @@
+{
+  "name": "mcp-camara-br",
+  "version": "1.0.0",
+  "description": "Servidor MCP para acesso aos dados abertos da Câmara dos Deputados do Brasil",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write 'src/**/*.ts'",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "camara",
+    "deputados",
+    "brasil",
+    "dados-abertos"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "axios": "^1.6.0",
+    "zod": "^3.22.0",
+    "lru-cache": "^10.0.0",
+    "dotenv": "^16.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.2.0",
+    "tsx": "^4.7.0",
+    "vitest": "^1.0.0",
+    "eslint": "^8.52.0",
+    "prettier": "^3.0.0"
+  }
+}

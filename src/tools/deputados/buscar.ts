@@ -37,19 +37,20 @@ export async function buscarDeputados(params: BuscarDeputadosParams) {
     }
 
     // Mapear parâmetros para o formato da API
-    const apiParams: Record<string, any> = { ...validated };
+    const apiParams: Record<string, any> = {};
 
-    // A API usa 'siglaUf' ao invés de 'uf'
-    if (validated.uf) {
-      apiParams.siglaUf = validated.uf;
-      delete apiParams.uf;
-    }
-
-    // A API usa 'siglaPartido' ao invés de 'partido'
-    if (validated.partido) {
-      apiParams.siglaPartido = validated.partido;
-      delete apiParams.partido;
-    }
+    // Mapear apenas os parâmetros fornecidos
+    if (validated.nome) apiParams.nome = validated.nome;
+    if (validated.uf) apiParams.siglaUf = validated.uf;
+    if (validated.partido) apiParams.siglaPartido = validated.partido;
+    if (validated.sexo) apiParams.sexo = validated.sexo;
+    if (validated.idLegislatura) apiParams.idLegislatura = validated.idLegislatura;
+    if (validated.dataInicio) apiParams.dataInicio = validated.dataInicio;
+    if (validated.dataFim) apiParams.dataFim = validated.dataFim;
+    if (validated.pagina) apiParams.pagina = validated.pagina;
+    if (validated.itens) apiParams.itens = validated.itens;
+    if (validated.ordem) apiParams.ordem = validated.ordem;
+    if (validated.ordenarPor) apiParams.ordenarPor = validated.ordenarPor;
 
     // API call
     const response = await camaraAPI.getWithPagination('/deputados', apiParams);

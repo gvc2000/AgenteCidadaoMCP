@@ -1,0 +1,51 @@
+{
+  "name": "mcp-camara-br",
+  "version": "1.0.0",
+  "description": "Servidor MCP completo para a API de Dados Abertos da Câmara dos Deputados do Brasil",
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write 'src/**/*.ts'",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "camara",
+    "deputados",
+    "brasil",
+    "dados-abertos",
+    "api"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "axios": "^1.6.8",
+    "zod": "^3.23.8",
+    "lru-cache": "^10.2.0",
+    "pino": "^9.0.0",
+    "dotenv": "^16.4.5",
+    "p-retry": "^6.2.0",
+    "p-queue": "^8.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0",
+    "nock": "^13.5.4",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "tsx": "^4.7.2",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

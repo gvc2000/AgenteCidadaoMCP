@@ -36,8 +36,23 @@ export async function buscarDeputados(params: BuscarDeputadosParams) {
       return { ...cached, _metadata: { ...cached._metadata, cache: true } };
     }
 
+    // Mapear parâmetros para o formato da API
+    const apiParams: Record<string, any> = { ...validated };
+
+    // A API usa 'siglaUf' ao invés de 'uf'
+    if (validated.uf) {
+      apiParams.siglaUf = validated.uf;
+      delete apiParams.uf;
+    }
+
+    // A API usa 'siglaPartido' ao invés de 'partido'
+    if (validated.partido) {
+      apiParams.siglaPartido = validated.partido;
+      delete apiParams.partido;
+    }
+
     // API call
-    const response = await camaraAPI.getWithPagination('/deputados', validated);
+    const response = await camaraAPI.getWithPagination('/deputados', apiParams);
 
     // Normalização
     const deputados = DataNormalizer.normalizeArray(

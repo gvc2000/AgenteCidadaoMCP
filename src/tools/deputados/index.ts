@@ -4,6 +4,7 @@ import { despesasDeputado, despesasDeputadoTool } from './despesas.js';
 import { discursosDeputado, discursosDeputadoTool } from './discursos.js';
 import { eventosDeputado, eventosDeputadoTool } from './eventos.js';
 import { frentesDeputado, frentesDeputadoTool } from './frentes.js';
+import { ocupacoesDeputado, ocupacoesDeputadoTool } from './ocupacoes.js';
 import { orgaosDeputado, orgaosDeputadoTool } from './orgaos.js';
 
 export {
@@ -19,6 +20,8 @@ export {
   eventosDeputadoTool,
   frentesDeputado,
   frentesDeputadoTool,
+  ocupacoesDeputado,
+  ocupacoesDeputadoTool,
   orgaosDeputado,
   orgaosDeputadoTool
 };
@@ -30,5 +33,6 @@ export const deputadosTools = [
   discursosDeputadoTool,
   eventosDeputadoTool,
   frentesDeputadoTool,
+  ocupacoesDeputadoTool,
   orgaosDeputadoTool
 ];

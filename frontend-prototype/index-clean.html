@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente Cidadão - Dados Abertos da Câmara</title>
+
+    <!-- React, ReactDOM e Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Google Fonts - Rawline similar (Open Sans) -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Cores minimalistas - Verde sutil */
+            --verde-institucional: #00652E;
+            --verde-accent: #00884B;
+            --verde-hover: #005A28;
+            --verde-light: #E8F4EF;
+            --verde-border: #C8E6D7;
+
+            /* Neutros clean */
+            --branco: #FFFFFF;
+            --off-white: #FAFAFA;
+            --cinza-50: #F8F9FA;
+            --cinza-100: #F1F3F5;
+            --cinza-200: #E9ECEF;
+            --cinza-300: #DEE2E6;
+            --cinza-400: #CED4DA;
+            --cinza-500: #ADB5BD;
+            --cinza-600: #6C757D;
+            --cinza-700: #495057;
+            --cinza-800: #343A40;
+            --cinza-900: #212529;
+
+            /* Accent sutil */
+            --azul-link: #0066CC;
+            --azul-link-hover: #004C99;
+        }
+
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: var(--off-white);
+            color: var(--cinza-800);
+            line-height: 1.6;
+        }
+
+        /* Header minimalista */
+        .header {
+            background: var(--branco);
+            border-bottom: 1px solid var(--cinza-200);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            background: var(--verde-institucional);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .header-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--cinza-900);
+        }
+
+        .header-subtitle {
+            font-size: 0.8125rem;
+            color: var(--cinza-600);
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            background: transparent;
+            border: 1px solid var(--cinza-300);
+            color: var(--cinza-700);
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 150ms ease;
+        }
+
+        .header-btn:hover {
+            background: var(--cinza-50);
+            border-color: var(--cinza-400);
+        }
+
+        /* Container principal */
+        .main-container {
+            max-width: 1140px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .chat-wrapper {
+            background: var(--branco);
+            border: 1px solid var(--cinza-200);
+            border-radius: 4px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Área de mensagens */
+        .messages-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+        .message {
+            margin-bottom: 2rem;
+            animation: fadeIn 300ms ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--cinza-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .message.user .message-label {
+            text-align: right;
+        }
+
+        .message-content {
+            background: var(--cinza-50);
+            border-left: 3px solid var(--cinza-300);
+            padding: 1rem 1.25rem;
+            border-radius: 2px;
+        }
+
+        .message.user .message-content {
+            background: var(--verde-light);
+            border-left: 3px solid var(--verde-institucional);
+            margin-left: auto;
+            max-width: 80%;
+        }
+
+        .message.assistant .message-content {
+            max-width: 100%;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--cinza-500);
+            margin-top: 0.5rem;
+        }
+
+        /* Cards minimalistas */
+        .data-card {
+            background: var(--branco);
+            border: 1px solid var(--cinza-300);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .card-header {
+            display: flex;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--cinza-200);
+            margin-bottom: 1rem;
+        }
+
+        .card-photo {
+            width: 64px;
+            height: 64px;
+            border-radius: 4px;
+            object-fit: cover;
+            background: var(--cinza-200);
+            border: 1px solid var(--cinza-300);
+        }
+
+        .card-info {
+            flex: 1;
+        }
+
+        .card-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--cinza-900);
+            margin-bottom: 0.25rem;
+        }
+
+        .card-meta {
+            font-size: 0.875rem;
+            color: var(--cinza-600);
+            margin-bottom: 0.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border-radius: 2px;
+            border: 1px solid;
+        }
+
+        .badge-success {
+            background: var(--verde-light);
+            color: var(--verde-institucional);
+            border-color: var(--verde-border);
+        }
+
+        .badge-info {
+            background: #E7F2FF;
+            color: #0066CC;
+            border-color: #B3D9FF;
+        }
+
+        .card-body {
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .card-detail {
+            padding: 0.5rem 0;
+            color: var(--cinza-700);
+            font-size: 0.875rem;
+        }
+
+        .card-detail strong {
+            color: var(--cinza-900);
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--cinza-200);
+        }
+
+        /* Botões minimalistas */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 150ms ease;
+            background: transparent;
+        }
+
+        .btn-primary {
+            background: var(--verde-institucional);
+            color: white;
+            border-color: var(--verde-institucional);
+        }
+
+        .btn-primary:hover {
+            background: var(--verde-hover);
+            border-color: var(--verde-hover);
+        }
+
+        .btn-outline {
+            color: var(--verde-institucional);
+            border-color: var(--cinza-400);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--verde-institucional);
+            background: var(--verde-light);
+        }
+
+        /* Input area clean */
+        .input-area {
+            border-top: 1px solid var(--cinza-200);
+            padding: 1.5rem;
+            background: var(--cinza-50);
+        }
+
+        .quick-suggestions {
+            margin-bottom: 1rem;
+        }
+
+        .suggestions-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--cinza-600);
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .suggestion-btn {
+            padding: 0.75rem 1rem;
+            background: var(--branco);
+            border: 1px solid var(--cinza-300);
+            border-radius: 4px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--cinza-700);
+            transition: all 150ms ease;
+        }
+
+        .suggestion-btn:hover {
+            border-color: var(--verde-institucional);
+            background: var(--verde-light);
+            color: var(--verde-institucional);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--cinza-300);
+            border-radius: 4px;
+            font-size: 0.9375rem;
+            font-family: inherit;
+            resize: none;
+            min-height: 48px;
+            background: var(--branco);
+            color: var(--cinza-900);
+            transition: border-color 150ms ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--verde-institucional);
+            box-shadow: 0 0 0 3px var(--verde-light);
+        }
+
+        .text-input::placeholder {
+            color: var(--cinza-500);
+        }
+
+        .send-button {
+            padding: 0.75rem 1.5rem;
+            background: var(--verde-institucional);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 150ms ease;
+            white-space: nowrap;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: var(--verde-hover);
+        }
+
+        .send-button:disabled {
+            background: var(--cinza-300);
+            cursor: not-allowed;
+        }
+
+        /* Empty state clean */
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: var(--verde-light);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cinza-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            font-size: 1rem;
+            color: var(--cinza-600);
+            margin-bottom: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .empty-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            padding: 1rem;
+            background: var(--branco);
+            border: 1px solid var(--cinza-200);
+            border-radius: 4px;
+            text-align: left;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: var(--cinza-900);
+            margin-bottom: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        .feature-desc {
+            font-size: 0.8125rem;
+            color: var(--cinza-600);
+        }
+
+        /* Loading clean */
+        .loading-message {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--cinza-600);
+            font-size: 0.875rem;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--cinza-300);
+            border-top-color: var(--verde-institucional);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-subtitle {
+                display: none;
+            }
+
+            .main-container {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .messages-area {
+                padding: 1rem;
+            }
+
+            .message.user .message-content {
+                max-width: 100%;
+            }
+
+            .suggestions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+
+            .send-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Dados de exemplo
+        const SAMPLE_DEPUTADO = {
+            id: 220593,
+            nome: "GUILHERME BOULOS",
+            siglaPartido: "PSOL",
+            siglaUf: "SP",
+            urlFoto: "https://www.camara.leg.br/internet/deputado/bandep/220593.jpg",
+            email: "dep.guilhermeboulos@camara.leg.br",
+            situacao: "Exercício"
+        };
+
+        const SAMPLE_PROPOSICAO = {
+            id: 2345678,
+            siglaTipo: "PL",
+            numero: 1234,
+            ano: 2024,
+            ementa: "Dispõe sobre a política nacional de segurança alimentar e nutricional e estabelece diretrizes para garantir o direito humano à alimentação adequada.",
+            dataApresentacao: "2024-03-15",
+            situacao: "Em tramitação"
+        };
+
+        // Header
+        function Header() {
+            return (
+                <header className="header">
+                    <div className="header-content">
+                        <div className="header-brand">
+                            <div className="header-logo">AC</div>
+                            <div>
+                                <div className="header-title">Agente Cidadão</div>
+                                <div className="header-subtitle">Dados Abertos da Câmara dos Deputados</div>
+                            </div>
+                        </div>
+                        <div className="header-actions">
+                            <button className="header-btn">Sobre</button>
+                            <button className="header-btn">Ajuda</button>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        // Card Deputado
+        function DeputadoCard({ deputado }) {
+            return (
+                <div className="data-card">
+                    <div className="card-header">
+                        <img src={deputado.urlFoto} alt={deputado.nome} className="card-photo" />
+                        <div className="card-info">
+                            <div className="card-name">{deputado.nome}</div>
+                            <div className="card-meta">{deputado.siglaPartido} • {deputado.siglaUf}</div>
+                            <span className="badge badge-success">{deputado.situacao}</span>
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        <div className="card-detail">
+                            <strong>E-mail:</strong> {deputado.email}
+                        </div>
+                    </div>
+                    <div className="card-actions">
+                        <button className="btn btn-primary">Ver Despesas</button>
+                        <button className="btn btn-outline">Ver Proposições</button>
+                        <button className="btn btn-outline">Ver Discursos</button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Card Proposição
+        function ProposicaoCard({ proposicao }) {
+            return (
+                <div className="data-card">
+                    <div className="card-header">
+                        <div className="card-info">
+                            <div className="card-name">
+                                {proposicao.siglaTipo} {proposicao.numero}/{proposicao.ano}
+                            </div>
+                            <span className="badge badge-info">{proposicao.situacao}</span>
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        <p>{proposicao.ementa}</p>
+                        <div className="card-detail" style={{ marginTop: '1rem' }}>
+                            <strong>Data de apresentação:</strong> {new Date(proposicao.dataApresentacao).toLocaleDateString('pt-BR')}
+                        </div>
+                    </div>
+                    <div className="card-actions">
+                        <button className="btn btn-primary">Ver Detalhes</button>
+                        <button className="btn btn-outline">Ver Autores</button>
+                        <button className="btn btn-outline">Acompanhar Tramitação</button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Message
+        function Message({ message }) {
+            return (
+                <div className={`message ${message.role}`}>
+                    <div className="message-label">
+                        {message.role === 'user' ? 'Você' : 'Agente Cidadão'}
+                    </div>
+                    <div className="message-content">
+                        <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                        {message.data && message.data.type === 'deputado' && (
+                            <DeputadoCard deputado={message.data.value} />
+                        )}
+                        {message.data && message.data.type === 'proposicao' && (
+                            <ProposicaoCard proposicao={message.data.value} />
+                        )}
+                        <div className="message-time">{message.time}</div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Empty State
+        function EmptyState() {
+            return (
+                <div className="empty-state">
+                    <div className="empty-icon">🇧🇷</div>
+                    <h1 className="empty-title">Agente Cidadão</h1>
+                    <p className="empty-description">
+                        Consulte dados públicos da Câmara dos Deputados através de perguntas em linguagem natural.
+                    </p>
+                    <div className="empty-features">
+                        <div className="feature-item">
+                            <div className="feature-title">Deputados</div>
+                            <div className="feature-desc">Informações sobre deputados federais</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-title">Proposições</div>
+                            <div className="feature-desc">Projetos de lei e emendas</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-title">Despesas</div>
+                            <div className="feature-desc">Gastos parlamentares públicos</div>
+                        </div>
+                        <div className="feature-item">
+                            <div className="feature-title">Votações</div>
+                            <div className="feature-desc">Registros de votações plenárias</div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Quick Suggestions
+        function QuickSuggestions({ onSelect }) {
+            const suggestions = [
+                'Deputados de São Paulo',
+                'Proposições sobre saúde',
+                'Despesas do último mês',
+                'Votações recentes'
+            ];
+
+            return (
+                <div className="quick-suggestions">
+                    <div className="suggestions-label">Sugestões de consulta</div>
+                    <div className="suggestions-grid">
+                        {suggestions.map((text, i) => (
+                            <button
+                                key={i}
+                                className="suggestion-btn"
+                                onClick={() => onSelect(text)}
+                            >
+                                {text}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // Loading
+        function LoadingMessage() {
+            return (
+                <div className="message assistant">
+                    <div className="message-label">Agente Cidadão</div>
+                    <div className="message-content">
+                        <div className="loading-message">
+                            <div className="loading-spinner"></div>
+                            <span>Consultando dados da Câmara dos Deputados...</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // App Principal
+        function App() {
+            const [messages, setMessages] = useState([]);
+            const [input, setInput] = useState('');
+            const [loading, setLoading] = useState(false);
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+            };
+
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const getTime = () => {
+                return new Date().toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            const simulateResponse = (query) => {
+                const lowerQuery = query.toLowerCase();
+
+                if (lowerQuery.includes('deputado') || lowerQuery.includes('guilherme') || lowerQuery.includes('boulos')) {
+                    return {
+                        content: 'Encontrei os dados do deputado solicitado:',
+                        data: { type: 'deputado', value: SAMPLE_DEPUTADO }
+                    };
+                } else if (lowerQuery.includes('proposição') || lowerQuery.includes('projeto') || lowerQuery.includes('pl') || lowerQuery.includes('saúde') || lowerQuery.includes('alimentação')) {
+                    return {
+                        content: 'Encontrei a seguinte proposição legislativa:',
+                        data: { type: 'proposicao', value: SAMPLE_PROPOSICAO }
+                    };
+                } else if (lowerQuery.includes('sp') || lowerQuery.includes('são paulo') || lowerQuery.includes('sao paulo')) {
+                    return {
+                        content: 'São Paulo possui 70 deputados federais. Exemplo:',
+                        data: { type: 'deputado', value: SAMPLE_DEPUTADO }
+                    };
+                } else {
+                    return {
+                        content: 'Posso ajudá-lo a consultar informações sobre deputados, proposições, despesas parlamentares, votações e discursos da Câmara dos Deputados. Faça uma pergunta específica para começar.',
+                        data: null
+                    };
+                }
+            };
+
+            const handleSend = async () => {
+                if (!input.trim() || loading) return;
+
+                const userMessage = {
+                    role: 'user',
+                    content: input,
+                    time: getTime()
+                };
+
+                setMessages(prev => [...prev, userMessage]);
+                setInput('');
+                setLoading(true);
+
+                setTimeout(() => {
+                    const response = simulateResponse(input);
+                    const assistantMessage = {
+                        role: 'assistant',
+                        content: response.content,
+                        data: response.data,
+                        time: getTime()
+                    };
+
+                    setMessages(prev => [...prev, assistantMessage]);
+                    setLoading(false);
+                }, 1200);
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                }
+            };
+
+            const handleSuggestion = (text) => {
+                setInput(text);
+            };
+
+            return (
+                <div>
+                    <Header />
+                    <div className="main-container">
+                        <div className="chat-wrapper">
+                            <div className="messages-area">
+                                {messages.length === 0 ? (
+                                    <EmptyState />
+                                ) : (
+                                    <>
+                                        {messages.map((message, i) => (
+                                            <Message key={i} message={message} />
+                                        ))}
+                                        {loading && <LoadingMessage />}
+                                        <div ref={messagesEndRef} />
+                                    </>
+                                )}
+                            </div>
+                            <div className="input-area">
+                                {messages.length === 0 && (
+                                    <QuickSuggestions onSelect={handleSuggestion} />
+                                )}
+                                <div className="input-container">
+                                    <div className="input-wrapper">
+                                        <textarea
+                                            className="text-input"
+                                            placeholder="Faça uma pergunta sobre a Câmara dos Deputados..."
+                                            value={input}
+                                            onChange={(e) => setInput(e.target.value)}
+                                            onKeyPress={handleKeyPress}
+                                            rows={1}
+                                        />
+                                    </div>
+                                    <button
+                                        className="send-button"
+                                        onClick={handleSend}
+                                        disabled={loading || !input.trim()}
+                                    >
+                                        Enviar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

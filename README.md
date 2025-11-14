@@ -138,6 +138,7 @@ METRICS_PORT=9090
 - `despesas_deputado` - Despesas da cota parlamentar
 - `discursos_deputado` - Discursos proferidos
 - `eventos_deputado` - Eventos que participou
+- `frentes_deputado` - Frentes parlamentares das quais é membro
 - `orgaos_deputado` - Órgãos dos quais é membro
 
 ### Proposições
@@ -188,19 +189,34 @@ Ou via JSON:
 }
 ```
 
+### Frentes Parlamentares de um Deputado
+
+```
+Quais frentes parlamentares o deputado Guilherme Boulos participa?
+```
+
+### Análise Completa de um Deputado
+
+```
+Me conte sobre a deputada Tabata Amaral:
+- Suas frentes parlamentares
+- Despesas de janeiro de 2024
+- Discursos recentes sobre educação
+```
+
 ### Despesas de um Deputado
 
 ```
-Mostre as despesas do deputado ID 204554 em janeiro de 2024
+Mostre as despesas do deputado Guilherme Boulos em janeiro de 2024
 ```
 
-Ou via JSON:
+Ou via JSON (usando ID):
 
 ```json
 {
   "tool": "despesas_deputado",
   "arguments": {
-    "id": 204554,
+    "id": 220000,
     "ano": 2024,
     "mes": 1
   }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
-import { createPaginacaoResposta, IdSchema, DateSchema } from '../../core/schemas.js';
+import { createPaginacaoResposta, IdSchema, DateSchema, HoraSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
 
@@ -11,8 +11,8 @@ const BuscarEventosSchema = z.object({
   idOrgao: IdSchema.optional(),
   dataInicio: DateSchema.optional(),
   dataFim: DateSchema.optional(),
-  horaInicio: z.string().regex(/^\d{2}:\d{2}$/).optional(),
-  horaFim: z.string().regex(/^\d{2}:\d{2}$/).optional(),
+  horaInicio: HoraSchema.optional(),
+  horaFim: HoraSchema.optional(),
   pagina: z.number().int().positive().default(1).optional(),
   itens: z.number().int().min(1).max(100).default(25).optional(),
   ordem: z.enum(['ASC', 'DESC']).optional(),

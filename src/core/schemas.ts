@@ -29,10 +29,47 @@ export const DateSchema = z.string().regex(
   'Data deve estar no formato YYYY-MM-DD'
 ).refine(
   (date) => {
+    const [year, month, day] = date.split('-').map(Number);
+
+    // Validar mês
+    if (month < 1 || month > 12) return false;
+
+    // Validar dia
+    if (day < 1 || day > 31) return false;
+
+    // Validar dias por mês
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    // Verificar ano bissexto
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+    if (isLeapYear) daysInMonth[1] = 29;
+
+    if (day > daysInMonth[month - 1]) return false;
+
+    // Validar que a data pode ser criada
     const d = new Date(date);
     return d instanceof Date && !isNaN(d.getTime());
   },
   'Data inválida'
+);
+
+// Validador de hora
+export const HoraSchema = z.string().regex(
+  /^\d{2}:\d{2}$/,
+  'Hora deve estar no formato HH:MM'
+).refine(
+  (hora) => {
+    const [hours, minutes] = hora.split(':').map(Number);
+
+    // Validar hora (0-23)
+    if (hours < 0 || hours > 23) return false;
+
+    // Validar minutos (0-59)
+    if (minutes < 0 || minutes > 59) return false;
+
+    return true;
+  },
+  'Hora inválida (hora deve ser 00-23, minutos 00-59)'
 );
 
 export const DateRangeSchema = z.object({

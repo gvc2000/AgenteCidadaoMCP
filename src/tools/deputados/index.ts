@@ -3,6 +3,7 @@ import { detalharDeputado, detalharDeputadoTool } from './detalhar.js';
 import { despesasDeputado, despesasDeputadoTool } from './despesas.js';
 import { discursosDeputado, discursosDeputadoTool } from './discursos.js';
 import { eventosDeputado, eventosDeputadoTool } from './eventos.js';
+import { frentesDeputado, frentesDeputadoTool } from './frentes.js';
 import { orgaosDeputado, orgaosDeputadoTool } from './orgaos.js';
 
 export {
@@ -16,6 +17,8 @@ export {
   discursosDeputadoTool,
   eventosDeputado,
   eventosDeputadoTool,
+  frentesDeputado,
+  frentesDeputadoTool,
   orgaosDeputado,
   orgaosDeputadoTool
 };
@@ -26,5 +29,6 @@ export const deputadosTools = [
   despesasDeputadoTool,
   discursosDeputadoTool,
   eventosDeputadoTool,
+  frentesDeputadoTool,
   orgaosDeputadoTool
 ];

@@ -12,12 +12,28 @@ import { metricsCollector } from './core/metrics.js';
 import { deputadosTools } from './tools/deputados/index.js';
 import { proposicoesTools } from './tools/proposicoes/index.js';
 import { votacoesTools } from './tools/votacoes/index.js';
+import { eventosTools } from './tools/eventos/index.js';
+import { orgaosTools } from './tools/orgaos/index.js';
+import { partidosTools } from './tools/partidos/index.js';
+import { frentesTools } from './tools/frentes/index.js';
+import { blocosTools } from './tools/blocos/index.js';
+import { legislaturasTools } from './tools/legislaturas/index.js';
+import { referenciasTools } from './tools/referencias/index.js';
+import { analisesTools } from './tools/analises/index.js';
 
 // Combine all tools
 const allTools = [
   ...deputadosTools,
   ...proposicoesTools,
-  ...votacoesTools
+  ...votacoesTools,
+  ...eventosTools,
+  ...orgaosTools,
+  ...partidosTools,
+  ...frentesTools,
+  ...blocosTools,
+  ...legislaturasTools,
+  ...referenciasTools,
+  ...analisesTools
 ];
 
 export class CamaraMCPServer {

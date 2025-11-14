@@ -18,7 +18,8 @@ const CACHE_STRATEGIES: Record<string, CacheStrategy> = {
   blocos: { ttl: 3600, maxSize: 50 },           // 1h
   legislaturas: { ttl: 86400, maxSize: 100 },   // 24h
   referencias: { ttl: 604800, maxSize: 100 },   // 7 dias
-  despesas: { ttl: 86400, maxSize: 500 }        // 24h
+  despesas: { ttl: 86400, maxSize: 500 },       // 24h
+  analises: { ttl: 1800, maxSize: 200 }         // 30min
 };
 
 class CacheManager {

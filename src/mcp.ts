@@ -19,6 +19,7 @@ import { frentesTools } from './tools/frentes/index.js';
 import { blocosTools } from './tools/blocos/index.js';
 import { legislaturasTools } from './tools/legislaturas/index.js';
 import { referenciasTools } from './tools/referencias/index.js';
+import { analisesTools } from './tools/analises/index.js';
 
 // Combine all tools
 const allTools = [
@@ -31,7 +32,8 @@ const allTools = [
   ...frentesTools,
   ...blocosTools,
   ...legislaturasTools,
-  ...referenciasTools
+  ...referenciasTools,
+  ...analisesTools
 ];
 
 export class CamaraMCPServer {

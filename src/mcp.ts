@@ -11,11 +11,13 @@ import { metricsCollector } from './core/metrics.js';
 // Import tools
 import { deputadosTools } from './tools/deputados/index.js';
 import { proposicoesTools } from './tools/proposicoes/index.js';
+import { votacoesTools } from './tools/votacoes/index.js';
 
 // Combine all tools
 const allTools = [
   ...deputadosTools,
-  ...proposicoesTools
+  ...proposicoesTools,
+  ...votacoesTools
 ];
 
 export class CamaraMCPServer {

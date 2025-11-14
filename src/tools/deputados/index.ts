@@ -6,6 +6,7 @@ import { eventosDeputado, eventosDeputadoTool } from './eventos.js';
 import { frentesDeputado, frentesDeputadoTool } from './frentes.js';
 import { ocupacoesDeputado, ocupacoesDeputadoTool } from './ocupacoes.js';
 import { orgaosDeputado, orgaosDeputadoTool } from './orgaos.js';
+import { profissoesDeputado, profissoesDeputadoTool } from './profissoes.js';
 
 export {
   buscarDeputados,
@@ -23,7 +24,9 @@ export {
   ocupacoesDeputado,
   ocupacoesDeputadoTool,
   orgaosDeputado,
-  orgaosDeputadoTool
+  orgaosDeputadoTool,
+  profissoesDeputado,
+  profissoesDeputadoTool
 };
 
 export const deputadosTools = [
@@ -34,5 +37,6 @@ export const deputadosTools = [
   eventosDeputadoTool,
   frentesDeputadoTool,
   ocupacoesDeputadoTool,
-  orgaosDeputadoTool
+  orgaosDeputadoTool,
+  profissoesDeputadoTool
 ];

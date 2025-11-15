@@ -1,0 +1,308 @@
+================================================================================
+COMPLETE FILE TREE - AgenteCidadaoMCP Project
+================================================================================
+
+AgenteCidadaoMCP/ [ROOT]
+│
+├── *** ROOT LEVEL FILES (Configuration & Documentation) ***
+│
+├── CONFIGURATION FILES (9 files)
+│   ├── package.json                    [2 KB] npm project manifest
+│   ├── tsconfig.json                   [1 KB] TypeScript compiler config
+│   ├── Dockerfile                      [1 KB] Multi-stage Docker build
+│   ├── docker-compose.yml              [1 KB] Docker Compose configuration
+│   ├── .env.example                    [894 B] Environment template
+│   ├── .eslintrc.json                  [478 B] ESLint rules
+│   ├── .prettierrc                     [174 B] Prettier formatting
+│   ├── .gitignore                      [417 B] Git exclusions
+│   └── claude_desktop_config.example.json [149 B] Claude Desktop template
+│
+├── MARKDOWN DOCUMENTATION (13 files, 5,966 lines, ~135KB)
+│   │
+│   ├── Core Documentation
+│   │   ├── README.md                   [346 lines, 7.5 KB] Main project readme
+│   │   ├── CLAUDE.md                   [787 lines, 22 KB] AI Assistant guide
+│   │   └── mcp-camara-br-especificacao-completa.md
+│   │                                   [1,136 lines, 26 KB] Technical specification
+│   │
+│   ├── Installation & Getting Started
+│   │   ├── GUIA_INSTALACAO_USO.md      [703 lines, 17 KB] Installation guide
+│   │   └── INICIO_RAPIDO.md            [158 lines, 3.5 KB] Quick start
+│   │
+│   ├── Examples & Practical Usage
+│   │   ├── EXEMPLOS_PRATICOS.md        [386 lines, 7.5 KB] Practical examples
+│   │   └── EXEMPLOS_TESTES.md          [199 lines, 4 KB] Test examples
+│   │
+│   ├── Testing & Quality Assurance
+│   │   ├── PLANO_TESTES_COMPLETO.md    [581 lines, 17 KB] Test plan
+│   │   ├── RELATORIO_TESTES.md         [361 lines, 10 KB] Test results
+│   │   ├── RELATORIO_FINAL_TESTES.md   [459 lines, 11 KB] Final test report
+│   │   └── RELATORIO_VERIFICACAO_FINAL.md
+│   │                                   [336 lines, 7.5 KB] Verification report
+│   │
+│   └── Pull Request Process
+│       ├── PR_DESCRICAO.md             [227 lines, 7 KB] PR description
+│       └── PR_MERGE_INSTRUCOES.md      [287 lines, 8 KB] Merge instructions
+│
+│
+├── *** SRC DIRECTORY (Backend - TypeScript MCP Server) ***
+│
+├── src/ [283 KB total, 83 TypeScript files, ~4,183 LOC]
+│   │
+│   ├── Entry Point & Configuration
+│   │   ├── server.ts                   [54 lines] Bootstrap server
+│   │   ├── mcp.ts                      [190 lines] MCP server setup
+│   │   └── config.ts                   [69 lines] Config management
+│   │
+│   ├── api/ [API Integration, 2 files, 424 LOC]
+│   │   ├── client.ts                   [131 lines] HTTP client + retry logic
+│   │   └── normalizers.ts              [293 lines] API response normalization
+│   │
+│   ├── core/ [Core Systems, 8 files, 1,051 LOC]
+│   │   ├── cache.ts                    [163 lines] LRU cache manager
+│   │   ├── rate-limiter.ts             [87 lines] Token bucket limiter
+│   │   ├── circuit-breaker.ts          [155 lines] Circuit breaker pattern
+│   │   ├── metrics.ts                  [255 lines] Prometheus metrics
+│   │   ├── logging.ts                  [65 lines] Pino logger setup
+│   │   ├── errors.ts                   [125 lines] Error classes
+│   │   ├── queue.ts                    [52 lines] Request queue
+│   │   └── schemas.ts                  [179 lines] Zod schemas
+│   │
+│   ├── tools/ [MCP Tools, 66 files, 11 categories]
+│   │   │
+│   │   ├── deputados/ [Deputy Tools - 10 files]
+│   │   │   ├── index.ts                [42 lines] Tool exports
+│   │   │   ├── buscar.ts               Search deputies by name/UF/party
+│   │   │   ├── detalhar.ts             Get deputy details
+│   │   │   ├── despesas.ts             Parliamentary expenses quota
+│   │   │   ├── discursos.ts            Deputy speeches
+│   │   │   ├── eventos.ts              Deputy events/participations
+│   │   │   ├── frentes.ts              Parliamentary fronts
+│   │   │   ├── orgaos.ts               Organizations/committees
+│   │   │   ├── profissoes.ts           Professional data
+│   │   │   └── ocupacoes.ts            Occupations
+│   │   │
+│   │   ├── proposicoes/ [Proposition Tools - 8 files]
+│   │   │   ├── index.ts                [34 lines] Tool exports
+│   │   │   ├── buscar.ts               Search bills/amendments
+│   │   │   ├── detalhar.ts             Proposition details
+│   │   │   ├── autores.ts              Authors/co-authors
+│   │   │   ├── votacoes.ts             Voting records
+│   │   │   ├── tramitacoes.ts          Processing steps/timeline
+│   │   │   ├── relacionadas.ts         Related propositions
+│   │   │   └── temas.ts                Topics/themes
+│   │   │
+│   │   ├── votacoes/ [Voting Tools - 5 files]
+│   │   │   ├── index.ts                [26 lines] Tool exports
+│   │   │   ├── buscar.ts               Search votings
+│   │   │   ├── detalhar.ts             Voting details
+│   │   │   ├── votos.ts                Individual votes
+│   │   │   ├── orientacoes.ts          Party orientations
+│   │   │   └── ultimas.ts              Latest votings
+│   │   │
+│   │   ├── orgaos/ [Organization Tools - 6 files]
+│   │   │   ├── index.ts                [26 lines] Tool exports
+│   │   │   ├── buscar.ts               Search organizations
+│   │   │   ├── detalhar.ts             Organization details
+│   │   │   ├── membros.ts              Member lists
+│   │   │   ├── eventos.ts              Events in org
+│   │   │   └── votacoes.ts             Org votings
+│   │   │
+│   │   ├── eventos/ [Event Tools - 7 files]
+│   │   │   ├── index.ts                [30 lines] Tool exports
+│   │   │   ├── buscar.ts               Search events
+│   │   │   ├── detalhar.ts             Event details
+│   │   │   ├── deputados.ts            Deputy participation
+│   │   │   ├── orgaos.ts               Org participation
+│   │   │   ├── pauta.ts                Agenda items
+│   │   │   └── votacoes.ts             Event votings
+│   │   │
+│   │   ├── partidos/ [Party Tools - 5 files]
+│   │   │   ├── index.ts                [18 lines] Tool exports
+│   │   │   ├── buscar.ts               Search parties
+│   │   │   ├── detalhar.ts             Party details
+│   │   │   ├── membros.ts              Party members
+│   │   │   └── lideres.ts              Party leadership
+│   │   │
+│   │   ├── legislaturas/ [Legislature Tools - 4 files]
+│   │   │   ├── index.ts                [15 lines] Tool exports
+│   │   │   ├── buscar.ts               Search legislatures
+│   │   │   ├── detalhar.ts             Legislature details
+│   │   │   └── mesa.ts                 Leadership board
+│   │   │
+│   │   ├── frentes/ [Front Tools - 4 files]
+│   │   │   ├── index.ts                [15 lines] Tool exports
+│   │   │   ├── buscar.ts               Search fronts
+│   │   │   ├── detalhar.ts             Front details
+│   │   │   └── membros.ts              Front members
+│   │   │
+│   │   ├── blocos/ [Bloc Tools - 3 files]
+│   │   │   ├── index.ts                [12 lines] Tool exports
+│   │   │   ├── buscar.ts               Search blocs
+│   │   │   └── detalhar.ts             Bloc details
+│   │   │
+│   │   ├── referencias/ [Reference Data Tools - 6 files]
+│   │   │   ├── index.ts                [21 lines] Tool exports
+│   │   │   ├── ufs.ts                  Brazilian states
+│   │   │   ├── situacoes.ts            Proposition statuses
+│   │   │   ├── tipos-proposicao.ts     Proposition types
+│   │   │   ├── tipos-orgao.ts          Organization types
+│   │   │   └── tipos-evento.ts         Event types
+│   │   │
+│   │   └── analises/ [Analysis Tools - 7 files]
+│   │       ├── index.ts                [24 lines] Tool exports
+│   │       ├── analise-despesas-partido.ts - Party spending analysis
+│   │       ├── analise-presenca.ts     Deputy attendance analysis
+│   │       ├── comparativo-votacoes.ts Voting comparison
+│   │       ├── ranking-proposicoes.ts  Proposition ranking
+│   │       ├── timeline-tramitacao.ts  Processing timeline
+│   │       └── exportar-dados.ts       Data export
+│   │
+│   └── utils/ [Utility Functions, 4 files, 247 LOC]
+│       ├── aggregators.ts              [110 lines] Data aggregation
+│       ├── currency.ts                 [29 lines] Currency formatting
+│       ├── date.ts                     [41 lines] Date utilities
+│       └── sanitizers.ts               [45 lines] Input sanitization
+│
+│
+├── *** FRONTEND DIRECTORY (Web UI - HTML/CSS/JavaScript) ***
+│
+├── frontend/ [250 KB total, 7 HTML files + 2 markdown docs]
+│   │
+│   ├── Prototype Versions (4 files)
+│   │   ├── prototipo-agente-cidadao-v4.html    [37 KB] ⭐ LATEST (v4)
+│   │   ├── prototipo-agente-cidadao-v3.html    [37 KB] Previous (v3)
+│   │   ├── prototipo-agente-cidadao-v2.html    [42 KB] Earlier (v2)
+│   │   └── prototipo-agente-cidadao.html       [35 KB] Original (v1)
+│   │
+│   ├── Special Interfaces (3 files)
+│   │   ├── admin-agente-cidadao.html           [29 KB] Admin dashboard
+│   │   ├── demo-agente-cidadao.html            [24 KB] Demo interface
+│   │   └── login-agente-cidadao.html           [12 KB] Login page
+│   │
+│   └── Documentation (2 files)
+│       ├── ESPECIFICACAO_FRONTEND.md           [22.5 KB] Tech spec
+│       └── PROTOTIPO_README.md                 [8.8 KB] Prototype docs
+│
+│
+├── *** BUILD & DEPENDENCY FILES (Generated, not tracked) ***
+│
+├── node_modules/ [~300+ MB] (generated, .gitignored)
+│   └── [npm dependencies]
+│
+├── dist/ [~500 KB] (generated, .gitignored)
+│   └── [compiled JavaScript output]
+│
+└── .git/ [.git metadata]
+
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+
+Code Files:
+  - TypeScript (.ts):           83 files, 4,183 LOC
+  - HTML/CSS/JavaScript:        7 files, 6,718 LOC
+  - Total Source Code:          90 files, 10,901 LOC
+
+Configuration:
+  - JSON configs:               3 files
+  - YAML/Docker:                2 files
+  - Dotfiles:                   4 files
+  - Total Config:               9 files
+
+Documentation:
+  - Markdown files:             15 files (13 root + 2 frontend)
+  - Total documentation:        5,966 lines
+
+Directory Sizes (without node_modules/dist):
+  - src/                        283 KB
+  - frontend/                   250 KB
+  - Documentation               135 KB
+  - Config                      4 KB
+  - Total Project               ~300 KB
+
+File Count by Type:
+  - TypeScript:                 83 files
+  - Markdown:                   15 files
+  - JSON:                       3 files
+  - HTML:                       7 files
+  - YAML:                       2 files
+  - Config/Ignore:              9 files
+  - Total:                      119 tracked files
+
+
+================================================================================
+KEY FILES REFERENCE
+================================================================================
+
+MUST READ (in order):
+  1. README.md                  - Start here
+  2. INICIO_RAPIDO.md           - Quick setup (5 minutes)
+  3. CLAUDE.md                  - Development guide
+  4. mcp-camara-br-especificacao-completa.md - Full specs
+
+CONFIGURATION TEMPLATES:
+  1. .env.example               - Environment setup
+  2. claude_desktop_config.example.json - Claude integration
+
+ENTRY POINTS:
+  1. src/server.ts              - Backend entry
+  2. frontend/prototipo-agente-cidadao-v4.html - Latest UI
+
+CORE SYSTEMS:
+  1. src/core/                  - See core functionality
+  2. src/api/                   - API client
+  3. src/tools/                 - MCP tools
+
+DEVELOPMENT:
+  1. package.json               - Dependencies and scripts
+  2. tsconfig.json              - TypeScript config
+  3. .eslintrc.json             - Code style
+
+DEPLOYMENT:
+  1. Dockerfile                 - Container build
+  2. docker-compose.yml         - Local development setup
+
+
+================================================================================
+FILE ORGANIZATION ASSESSMENT
+================================================================================
+
+BACKEND (src/): EXCELLENT
+  Status: Well-organized, follows best practices
+  - Layered architecture: api/ -> core/ -> tools/
+  - Consistent naming: kebab-case files, PascalCase types
+  - Clear separation of concerns
+  - No organizational issues detected
+
+CONFIGURATION: GOOD
+  Status: Centralized and properly configured
+  - All config in root directory
+  - Docker setup is modern and correct
+  - Environment handling is proper
+  - Minor: Could have separate config/ directory
+
+FRONTEND: NEEDS WORK
+  Status: Not production-ready structure
+  Issues:
+    - Monolithic HTML files (35-42 KB each)
+    - Multiple prototype versions in same dir
+    - Embedded CSS/JavaScript (no separation)
+    - No build pipeline
+    - Development workflow unclear
+  Action: Modernize with proper React/Vite structure
+
+DOCUMENTATION: NEEDS ORGANIZATION
+  Status: Comprehensive but scattered
+  Issues:
+    - 13 files in root directory
+    - Mix of process docs and user docs
+    - Report files from testing process
+    - PR-specific documents
+  Action: Create docs/ directory, organize by purpose
+
+
+================================================================================
+END OF FILE TREE
+================================================================================

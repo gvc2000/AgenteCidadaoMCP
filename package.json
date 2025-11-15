@@ -12,15 +12,23 @@
     "build": "tsc",
     "build:unix": "tsc && chmod +x dist/server.js",
     "start": "node dist/server.js",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean",
+    "prepare": "npm run build",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
     "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
     "format": "prettier --write 'src/**/*.ts'",
+    "format:check": "prettier --check 'src/**/*.ts'",
     "type-check": "tsc --noEmit",
+    "validate": "npm run type-check && npm run lint && npm run format:check && npm test",
     "generate:types": "tsx scripts/generate-types.ts",
     "update:cache": "tsx scripts/update-cache.ts",
     "docker:build": "docker build -t mcp-camara-br .",
-    "docker:run": "docker-compose up"
+    "docker:run": "docker-compose up",
+    "docker:stop": "docker-compose down"
   },
   "keywords": [
     "mcp",
@@ -34,6 +42,20 @@
   ],
   "author": "",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gvc2000/AgenteCidadaoMCP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gvc2000/AgenteCidadaoMCP/issues"
+  },
+  "homepage": "https://github.com/gvc2000/AgenteCidadaoMCP#readme",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "axios": "^1.6.0",

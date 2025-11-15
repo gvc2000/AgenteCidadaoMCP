@@ -249,33 +249,92 @@ Os logs são estruturados em JSON (padrão) ou formato pretty para desenvolvimen
 LOG_FORMAT=pretty npm start
 ```
 
-## Arquitetura
+## 📁 Estrutura do Projeto
 
 ```
-mcp-camara-br/
-├── src/
+AgenteCidadaoMCP/
+├── src/                          # Código-fonte do MCP Server
 │   ├── server.ts                 # Entry point
 │   ├── mcp.ts                    # MCP server setup
 │   ├── config.ts                 # Configurações
-│   ├── api/
-│   │   ├── client.ts             # Cliente HTTP
+│   │
+│   ├── api/                      # Cliente HTTP e comunicação
+│   │   ├── client.ts             # Cliente HTTP com retry
 │   │   └── normalizers.ts        # Normalização de dados
-│   ├── core/
-│   │   ├── cache.ts              # Sistema de cache
-│   │   ├── errors.ts             # Tratamento de erros
-│   │   ├── logging.ts            # Sistema de logs
-│   │   ├── metrics.ts            # Métricas
-│   │   ├── rate-limiter.ts       # Rate limiting
-│   │   ├── circuit-breaker.ts    # Circuit breaker
+│   │
+│   ├── core/                     # Sistemas core
+│   │   ├── cache.ts              # Sistema de cache LRU
+│   │   ├── errors.ts             # Classes de erro customizadas
+│   │   ├── logging.ts            # Logs estruturados (Pino)
+│   │   ├── metrics.ts            # Métricas Prometheus
+│   │   ├── rate-limiter.ts       # Rate limiting (token bucket)
+│   │   ├── circuit-breaker.ts    # Circuit breaker pattern
 │   │   ├── queue.ts              # Fila de requisições
-│   │   └── schemas.ts            # Schemas Zod
-│   ├── tools/
-│   │   ├── deputados/            # Tools de deputados
-│   │   └── proposicoes/          # Tools de proposições
+│   │   └── schemas.ts            # Schemas Zod compartilhados
+│   │
+│   ├── tools/                    # MCP Tools organizados por categoria
+│   │   ├── deputados/            # 10 tools sobre deputados
+│   │   ├── proposicoes/          # 8 tools sobre proposições
+│   │   ├── votacoes/             # 5 tools sobre votações
+│   │   ├── orgaos/               # 6 tools sobre órgãos
+│   │   ├── eventos/              # 7 tools sobre eventos
+│   │   ├── partidos/             # 5 tools sobre partidos
+│   │   ├── legislaturas/         # 4 tools sobre legislaturas
+│   │   ├── frentes/              # 4 tools sobre frentes
+│   │   ├── blocos/               # 3 tools sobre blocos
+│   │   ├── referencias/          # 6 tools de referência
+│   │   └── analises/             # 7 tools de análise e export
+│   │
 │   └── utils/                    # Utilitários
-├── tests/                        # Testes
-├── docs/                         # Documentação
-└── scripts/                      # Scripts utilitários
+│       ├── aggregators.ts        # Agregação de dados
+│       ├── currency.ts           # Formatação de moeda
+│       ├── date.ts               # Utilitários de data
+│       └── sanitizers.ts         # Sanitização de inputs
+│
+├── frontend/                     # Interface Web
+│   ├── current/                  # Versão atual (v4)
+│   │   ├── index.html           # Interface principal
+│   │   ├── admin-agente-cidadao.html
+│   │   ├── demo-agente-cidadao.html
+│   │   └── login-agente-cidadao.html
+│   ├── archive/                  # Versões anteriores
+│   └── README.md                 # Documentação do frontend
+│
+├── docs/                         # Documentação organizada
+│   ├── guides/                   # Guias de instalação e uso
+│   │   ├── GUIA_INSTALACAO_USO.md
+│   │   └── INICIO_RAPIDO.md
+│   ├── examples/                 # Exemplos práticos
+│   │   ├── EXEMPLOS_PRATICOS.md
+│   │   └── EXEMPLOS_TESTES.md
+│   ├── testing/                  # Planos e relatórios de testes
+│   ├── process/                  # Artefatos de processo
+│   ├── specs/                    # Especificações técnicas
+│   │   └── mcp-camara-br-especificacao-completa.md
+│   └── README.md                 # Índice da documentação
+│
+├── scripts/                      # Scripts utilitários
+│   └── healthcheck.sh           # Health check para deploy
+│
+├── .github/                      # GitHub Actions
+│   └── workflows/
+│       ├── ci.yml               # CI/CD pipeline
+│       └── release.yml          # Release automation
+│
+├── dist/                         # Código compilado (gerado)
+│
+├── .env.example                  # Template de variáveis de ambiente
+├── .dockerignore                 # Arquivos ignorados no Docker build
+├── .npmignore                    # Arquivos ignorados no npm publish
+├── Dockerfile                    # Multi-stage Docker build
+├── docker-compose.yml            # Docker Compose config
+├── package.json                  # Configuração npm
+├── tsconfig.json                 # Configuração TypeScript
+│
+├── README.md                     # Este arquivo
+├── CONTRIBUTING.md               # Guia de contribuição
+├── CLAUDE.md                     # Guia para assistentes de IA
+└── LICENSE                       # Licença MIT
 ```
 
 ## Desenvolvimento
@@ -300,7 +359,7 @@ npm run format
 npm run type-check
 ```
 
-## Performance
+## ⚡ Performance
 
 O servidor implementa várias otimizações:
 
@@ -310,22 +369,71 @@ O servidor implementa várias otimizações:
 - **Request Queue**: Controla concorrência
 - **Retry Logic**: Exponential backoff com jitter
 
+## 🔄 CI/CD
+
+O projeto possui workflows automatizados do GitHub Actions:
+
+### CI (Integração Contínua)
+- ✅ Type checking (TypeScript)
+- ✅ Linting (ESLint)
+- ✅ Formatação (Prettier)
+- ✅ Testes automatizados
+- ✅ Build em Node.js 20.x e 21.x
+- ✅ Build Docker
+
+### Release (Publicação)
+- 🚀 Criação automática de releases no GitHub
+- 🚀 Build de imagens Docker em tags
+- 📦 Preparado para publicação no npm (requer configuração)
+
+**Configuração:**
+Os workflows estão em `.github/workflows/`:
+- `ci.yml` - Executado em push/PR para main/develop
+- `release.yml` - Executado ao criar tags (v*)
+
 ## 📚 Documentação Completa
 
-- [Guia de Instalação e Uso](./GUIA_INSTALACAO_USO.md) - Documentação completa de instalação e configuração
-- [Início Rápido](./INICIO_RAPIDO.md) - Guia de 5 minutos para começar
-- [Exemplos Práticos](./EXEMPLOS_PRATICOS.md) - Exemplos de uso com LLMs
-- [Especificação Técnica](./mcp-camara-br-especificacao-completa.md) - Especificação completa do servidor
+### Guias
+- [Início Rápido](./docs/guides/INICIO_RAPIDO.md) - Comece em 5 minutos
+- [Guia de Instalação e Uso](./docs/guides/GUIA_INSTALACAO_USO.md) - Instalação e configuração completas
 
-## Contribuindo
+### Exemplos e Testes
+- [Exemplos Práticos](./docs/examples/EXEMPLOS_PRATICOS.md) - Casos de uso com LLMs
+- [Exemplos de Testes](./docs/examples/EXEMPLOS_TESTES.md) - Validação e testes
 
-Contribuições são bem-vindas! Por favor:
+### Especificações
+- [Especificação Técnica Completa](./docs/specs/mcp-camara-br-especificacao-completa.md) - Documentação técnica detalhada
+
+### Para Desenvolvedores
+- [Guia de Contribuição](./CONTRIBUTING.md) - Como contribuir com o projeto
+- [Guia para IA (CLAUDE.md)](./CLAUDE.md) - Instruções para assistentes de IA
+
+### Índice Completo
+- [Documentação Organizada](./docs/README.md) - Índice completo de toda documentação
+
+## 🤝 Contribuindo
+
+Contribuições são muito bem-vindas! Este projeto segue boas práticas de desenvolvimento e possui diretrizes claras para contribuidores.
+
+**Antes de contribuir, leia:**
+- [CONTRIBUTING.md](./CONTRIBUTING.md) - Guia completo de contribuição com padrões de código, workflow e boas práticas
+
+**Resumo rápido:**
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+3. Siga os padrões de código (TypeScript strict, ESLint, Prettier)
+4. Escreva testes para novas funcionalidades
+5. Commit usando [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, etc.)
+6. Push para a branch (`git push origin feature/MinhaFeature`)
+7. Abra um Pull Request com descrição detalhada
+
+**Scripts úteis para desenvolvimento:**
+```bash
+npm run validate    # Executa type-check + lint + format-check + tests
+npm run lint:fix    # Corrige problemas de lint automaticamente
+npm run format      # Formata o código com Prettier
+```
 
 ## Licença
 

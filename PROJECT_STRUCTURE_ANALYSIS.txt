@@ -1,0 +1,548 @@
+================================================================================
+COMPREHENSIVE PROJECT STRUCTURE ANALYSIS
+AgenteCidadaoMCP - Model Context Protocol Server for Brazilian Chamber
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+Name:           mcp-camara-br (AgenteCidadaoMCP)
+Type:           Full-Stack Project (Backend MCP Server + Frontend Web UI)
+Language:       TypeScript (Backend) + HTML5/CSS3/JavaScript (Frontend)
+Size:           ~300KB code (excluding node_modules and dist)
+Documentation:  ~5,966 lines across 13 markdown files
+Frontend:       ~6,718 lines across 7 HTML prototypes
+
+================================================================================
+1. DIRECTORY STRUCTURE VISUALIZATION
+================================================================================
+
+AgenteCidadaoMCP/
+├── ROOT CONFIGURATION FILES (8 files, 4KB)
+│   ├── package.json                    - npm project config
+│   ├── tsconfig.json                   - TypeScript compiler config
+│   ├── Dockerfile                      - Docker multi-stage build config
+│   ├── docker-compose.yml              - Docker Compose orchestration
+│   ├── .env.example                    - Environment variables template
+│   ├── .gitignore                      - Git ignore rules
+│   ├── .eslintrc.json                  - ESLint code style rules
+│   ├── .prettierrc                     - Prettier formatting rules
+│   └── claude_desktop_config.example.json - Claude Desktop config template
+│
+├── src/ (283KB) - BACKEND MCP SERVER (TypeScript)
+│   ├── server.ts (54 lines)             - Entry point, bootstraps MCP server
+│   ├── mcp.ts (190 lines)               - MCP server setup, tool registration
+│   ├── config.ts (69 lines)             - Configuration management
+│   │
+│   ├── api/                              - External API integration
+│   │   ├── client.ts (131 lines)        - HTTP client with retry logic
+│   │   └── normalizers.ts (293 lines)   - API response normalization
+│   │
+│   ├── core/                             - Cross-cutting concerns (7 files, 1,051 lines)
+│   │   ├── cache.ts (163 lines)         - LRU cache with tiered TTLs
+│   │   ├── rate-limiter.ts (87 lines)   - Token bucket rate limiter
+│   │   ├── circuit-breaker.ts (155 lines) - Circuit breaker for resilience
+│   │   ├── metrics.ts (255 lines)       - Prometheus metrics collection
+│   │   ├── logging.ts (65 lines)        - Pino structured logging
+│   │   ├── errors.ts (125 lines)        - Custom error classes
+│   │   ├── queue.ts (52 lines)          - Request queue management
+│   │   └── schemas.ts (179 lines)       - Shared Zod validation schemas
+│   │
+│   ├── tools/                            - MCP Tool implementations (66 files, ~3,000+ lines)
+│   │   ├── deputados/                    - Deputy-related tools (10 files)
+│   │   │   ├── index.ts (42 lines)      - Exports all deputy tools
+│   │   │   ├── buscar.ts                - Search deputies
+│   │   │   ├── detalhar.ts              - Get deputy details
+│   │   │   ├── despesas.ts              - Deputy parliamentary expenses
+│   │   │   ├── discursos.ts             - Deputy speeches
+│   │   │   ├── eventos.ts               - Deputy events
+│   │   │   ├── frentes.ts               - Deputy parliamentary fronts
+│   │   │   ├── orgaos.ts                - Deputy organizations/committees
+│   │   │   ├── profissoes.ts            - Deputy professions
+│   │   │   └── ocupacoes.ts             - Deputy occupations
+│   │   │
+│   │   ├── proposicoes/                  - Proposition-related tools (8 files)
+│   │   │   ├── index.ts (34 lines)      - Exports all proposition tools
+│   │   │   ├── buscar.ts                - Search propositions/bills
+│   │   │   ├── detalhar.ts              - Get proposition details
+│   │   │   ├── autores.ts               - Get proposition authors
+│   │   │   ├── votacoes.ts              - Proposition voting data
+│   │   │   ├── tramitacoes.ts           - Proposition processing steps
+│   │   │   ├── relacionadas.ts          - Related propositions
+│   │   │   └── temas.ts                 - Proposition themes/topics
+│   │   │
+│   │   ├── votacoes/                     - Voting-related tools (5 files)
+│   │   │   ├── index.ts (26 lines)
+│   │   │   ├── buscar.ts                - Search votings
+│   │   │   ├── detalhar.ts              - Voting details
+│   │   │   ├── votos.ts                 - Individual votes
+│   │   │   ├── orientacoes.ts           - Party voting orientations
+│   │   │   └── ultimas.ts               - Latest votings
+│   │   │
+│   │   ├── orgaos/                       - Organization/Committee tools (6 files)
+│   │   │   ├── index.ts (26 lines)
+│   │   │   ├── buscar.ts
+│   │   │   ├── detalhar.ts
+│   │   │   ├── membros.ts
+│   │   │   ├── eventos.ts
+│   │   │   └── votacoes.ts
+│   │   │
+│   │   ├── eventos/                      - Event-related tools (7 files)
+│   │   │   ├── index.ts (30 lines)
+│   │   │   ├── buscar.ts
+│   │   │   ├── detalhar.ts
+│   │   │   ├── deputados.ts
+│   │   │   ├── orgaos.ts
+│   │   │   ├── pauta.ts
+│   │   │   └── votacoes.ts
+│   │   │
+│   │   ├── partidos/                     - Political party tools (5 files)
+│   │   │   ├── index.ts (18 lines)
+│   │   │   ├── buscar.ts
+│   │   │   ├── detalhar.ts
+│   │   │   ├── membros.ts
+│   │   │   └── lideres.ts
+│   │   │
+│   │   ├── legislaturas/                 - Legislative session tools (4 files)
+│   │   │   ├── index.ts (15 lines)
+│   │   │   ├── buscar.ts
+│   │   │   ├── detalhar.ts
+│   │   │   └── mesa.ts
+│   │   │
+│   │   ├── frentes/                      - Parliamentary front tools (4 files)
+│   │   │   ├── index.ts (15 lines)
+│   │   │   ├── buscar.ts
+│   │   │   ├── detalhar.ts
+│   │   │   └── membros.ts
+│   │   │
+│   │   ├── blocos/                       - Parliamentary bloc tools (3 files)
+│   │   │   ├── index.ts (12 lines)
+│   │   │   ├── buscar.ts
+│   │   │   └── detalhar.ts
+│   │   │
+│   │   ├── referencias/                  - Reference data tools (6 files)
+│   │   │   ├── index.ts (21 lines)
+│   │   │   ├── ufs.ts                   - Brazilian states
+│   │   │   ├── situacoes.ts             - Proposition statuses
+│   │   │   ├── tipos-proposicao.ts      - Proposition types
+│   │   │   ├── tipos-orgao.ts           - Organization types
+│   │   │   └── tipos-evento.ts          - Event types
+│   │   │
+│   │   └── analises/                     - Analysis and data export tools (7 files)
+│   │       ├── index.ts (24 lines)
+│   │       ├── analise-despesas-partido.ts
+│   │       ├── analise-presenca.ts
+│   │       ├── comparativo-votacoes.ts
+│   │       ├── ranking-proposicoes.ts
+│   │       ├── timeline-tramitacao.ts
+│   │       └── exportar-dados.ts
+│   │
+│   └── utils/                            - Utility functions (4 files, 247 lines)
+│       ├── aggregators.ts (110 lines)   - Data aggregation functions
+│       ├── currency.ts (29 lines)       - Currency formatting
+│       ├── date.ts (41 lines)           - Date utilities
+│       └── sanitizers.ts (45 lines)     - Input sanitization
+│
+├── frontend/ (250KB) - FRONTEND WEB UI (HTML5/CSS3/JavaScript)
+│   ├── prototipo-agente-cidadao-v4.html (37KB) ⭐ LATEST PROTOTYPE
+│   ├── prototipo-agente-cidadao-v3.html (37KB) - Previous version
+│   ├── prototipo-agente-cidadao-v2.html (42KB) - Earlier version
+│   ├── prototipo-agente-cidadao.html (35KB)    - Original version
+│   ├── admin-agente-cidadao.html (29KB)        - Admin interface
+│   ├── demo-agente-cidadao.html (24KB)         - Demo interface
+│   ├── login-agente-cidadao.html (12KB)        - Login page
+│   ├── ESPECIFICACAO_FRONTEND.md                - Frontend technical spec
+│   └── PROTOTIPO_README.md                     - Prototype documentation
+│
+├── DOCUMENTATION (13 markdown files, ~5,966 lines, 135KB)
+│   ├── CLAUDE.md (787 lines)                   - AI Assistant guide (THIS FILE)
+│   ├── README.md (346 lines)                   - Main project README
+│   ├── mcp-camara-br-especificacao-completa.md (1,136 lines) - Full technical spec
+│   ├── GUIA_INSTALACAO_USO.md (703 lines)      - Complete installation guide
+│   ├── PLANO_TESTES_COMPLETO.md (581 lines)    - Full test plan
+│   ├── RELATORIO_FINAL_TESTES.md (459 lines)   - Test report
+│   ├── EXEMPLOS_PRATICOS.md (386 lines)        - Practical examples
+│   ├── RELATORIO_TESTES.md (361 lines)         - Test results
+│   ├── EXEMPLOS_TESTES.md (199 lines)          - Test examples
+│   ├── RELATORIO_VERIFICACAO_FINAL.md (336 lines) - Verification report
+│   ├── PR_MERGE_INSTRUCOES.md (287 lines)      - PR merge instructions
+│   ├── PR_DESCRICAO.md (227 lines)             - PR description
+│   └── INICIO_RAPIDO.md (158 lines)            - Quick start guide
+
+================================================================================
+2. FILE CATEGORIZATION SUMMARY
+================================================================================
+
+BACKEND - MCP SERVER (TypeScript)
+  Total Files: 83 TypeScript files
+  Total Size: ~283KB
+  Total Lines: ~4,183 LOC
+  Structure: Layered architecture with separation of concerns
+
+  Core System Files (8 files, 1,051 LOC)
+  - Cache, Rate Limiter, Circuit Breaker, Metrics, Logging, Errors, Queue, Schemas
+
+  API Integration (2 files, 424 LOC)
+  - HTTP client with retry logic, API response normalizers
+
+  Tools/Features (11 categories, 66 files, ~3,000+ LOC)
+  - Deputados, Proposicoes, Votacoes, Orgaos, Eventos, Partidos, Legislaturas,
+    Frentes, Blocos, Referencias, Analises
+
+  Utilities (4 files, 247 LOC)
+  - Data aggregation, currency formatting, date utilities, sanitizers
+
+  Server Entry (2 files, 123 LOC)
+  - Server bootstrap, MCP server configuration
+
+FRONTEND - WEB UI (HTML5/CSS3/JavaScript)
+  Total Files: 7 HTML prototypes + 2 markdown files
+  Total Size: ~250KB code + 31KB documentation
+  Total Lines: ~6,718 LOC (HTML with embedded CSS/JavaScript)
+  Structure: Single-file React prototypes with embedded Babel JSX compilation
+
+  Prototypes (4 versions)
+  - v4: Latest with optimized layout (37KB, latest improvements)
+  - v3: Previous iteration (37KB)
+  - v2: Earlier version (42KB)
+  - v1: Original version (35KB)
+
+  Special Interfaces (3 files)
+  - Admin dashboard (29KB)
+  - Demo interface (24KB)
+  - Login page (12KB)
+
+CONFIGURATION FILES (9 files)
+  - package.json              - npm/Node.js project config
+  - tsconfig.json             - TypeScript compiler options
+  - Dockerfile                - Docker multi-stage build
+  - docker-compose.yml        - Docker Compose setup
+  - .env.example              - Environment variables template
+  - .gitignore               - Git ignore rules
+  - .eslintrc.json           - ESLint configuration
+  - .prettierrc               - Prettier formatting
+  - claude_desktop_config.example.json - Claude Desktop config
+
+DOCUMENTATION (13 markdown files, 5,966 lines)
+  Core Documentation:
+  - CLAUDE.md               - Comprehensive AI assistant guide
+  - README.md              - Main project documentation
+  - mcp-camara-br-especificacao-completa.md - Full technical specification
+
+  Installation & Usage:
+  - GUIA_INSTALACAO_USO.md - Detailed installation guide
+  - INICIO_RAPIDO.md       - 5-minute quick start
+
+  Examples & Testing:
+  - EXEMPLOS_PRATICOS.md   - Practical LLM usage examples
+  - EXEMPLOS_TESTES.md     - Test examples
+  - PLANO_TESTES_COMPLETO.md - Complete test plan
+
+  Reports:
+  - RELATORIO_FINAL_TESTES.md - Final test report
+  - RELATORIO_TESTES.md - Test results
+  - RELATORIO_VERIFICACAO_FINAL.md - Verification report
+
+  Pull Request:
+  - PR_MERGE_INSTRUCOES.md - PR merge instructions
+  - PR_DESCRICAO.md - PR description
+
+  Frontend-Specific:
+  - frontend/ESPECIFICACAO_FRONTEND.md - Frontend technical spec
+  - frontend/PROTOTIPO_README.md - Prototype documentation
+
+================================================================================
+3. CURRENT ORGANIZATION STATUS
+================================================================================
+
+WELL-ORGANIZED ASPECTS:
+✓ Backend code: Excellent layered architecture
+  - Clear separation: api/, core/, tools/, utils/
+  - Tool categories logically grouped by feature domain
+  - Consistent file naming (kebab-case)
+  - Each tool follows standard pattern (search, detail, related data)
+
+✓ Configuration: Properly centralized
+  - All config in root directory
+  - Environment variables in .env.example
+  - Build tools configured correctly
+
+✓ Documentation: Comprehensive
+  - Multiple guides for different audiences
+  - Technical specifications included
+  - Installation and usage well documented
+
+✓ Container Setup: Modern and clean
+  - Multi-stage Docker build (small image size)
+  - Docker Compose configuration
+  - Proper signal handling with Tini
+
+AREAS REQUIRING ORGANIZATION:
+
+✗ FRONTEND NEEDS MAJOR REORGANIZATION (HIGH PRIORITY)
+  Problem: HTML files are monolithic single-file applications
+  Current State:
+    - 7 standalone HTML files (~35-42KB each)
+    - Each contains full HTML, CSS, and JavaScript
+    - Embedded React with Babel compilation
+    - Duplicate code across versions
+    - No separation of concerns
+
+  Issues:
+    1. Version proliferation: v1, v2, v3, v4 all stored together
+    2. No source control clarity: unclear which is "current"
+    3. Maintenance burden: changes must be made in multiple files
+    4. No build pipeline: code is not minified or optimized
+    5. No modular structure: CSS/JS not separated from markup
+    6. Embedded CDN scripts: no offline capability
+
+  Recommended Structure:
+    frontend/
+    ├── public/
+    │   ├── index.html          - Main entry point
+    │   ├── admin.html
+    │   ├── demo.html
+    │   └── login.html
+    ├── src/
+    │   ├── components/
+    │   │   ├── ChatInterface.jsx
+    │   │   ├── AdminDashboard.jsx
+    │   │   ├── LoginForm.jsx
+    │   │   └── ...
+    │   ├── styles/
+    │   │   ├── main.css
+    │   │   ├── components.css
+    │   │   └── ...
+    │   ├── utils/
+    │   │   ├── api.js
+    │   │   ├── helpers.js
+    │   │   └── ...
+    │   ├── index.jsx
+    │   └── app.jsx
+    ├── package.json
+    ├── vite.config.js (or webpack.config.js)
+    └── README.md
+
+✗ DOCUMENTATION ACCUMULATION (MEDIUM PRIORITY)
+  Problem: Multiple markdown files in root, some redundant
+  Current State:
+    - 13 MD files in root directory (5,966 lines)
+    - Several report files from testing/PR process
+    - Mix of user-facing and process documentation
+
+  Issues:
+    1. Scattered documentation: hard to know what's current
+    2. Report files: RELATORIO_*.md, PLANO_TESTES_*.md seem temporary
+    3. PR files: PR_DESCRICAO.md, PR_MERGE_INSTRUCOES.md specific to one PR
+    4. Unclear audience: which docs for users vs developers
+
+  Recommended Structure:
+    docs/
+    ├── README.md               - Start here
+    ├── INSTALLATION.md         - Installation guide (from GUIA_INSTALACAO_USO.md)
+    ├── QUICK_START.md          - Quick start (from INICIO_RAPIDO.md)
+    ├── ARCHITECTURE.md         - Architecture guide
+    ├── API_REFERENCE.md        - MCP tools reference
+    ├── DEVELOPMENT.md          - Development guide (from CLAUDE.md)
+    ├── EXAMPLES.md             - Usage examples
+    ├── TESTING.md              - Testing guide
+    └── TROUBLESHOOTING.md      - Troubleshooting
+
+  Root README.md should point to docs/
+
+✗ FRONTEND DOCUMENTATION PLACEMENT (MEDIUM PRIORITY)
+  Current: frontend/ESPECIFICACAO_FRONTEND.md, frontend/PROTOTIPO_README.md
+  Recommendation: Move to docs/frontend/ or frontend/docs/
+
+================================================================================
+4. FILE STATISTICS
+================================================================================
+
+Language Breakdown:
+  TypeScript (.ts):     83 files (~4,183 LOC)
+  HTML/CSS/JS:          7 files (~6,718 LOC)
+  Markdown (.md):       15 files (~5,966 lines)
+  JSON:                 3 files (config)
+  YAML:                 2 files (Docker)
+  Other:                ~10 config/ignore files
+
+Total Project Size: ~300KB (code only, excluding node_modules/dist)
+
+Code Metrics:
+  Backend TS:           4,183 LOC
+  Frontend HTML:        6,718 LOC
+  Documentation:        5,966 lines
+  Total (no dependencies): ~16,900 lines
+
+Directory Sizes:
+  src/                  283KB
+  frontend/             250KB
+  Docs (MD):            135KB
+  Config:               4KB
+
+================================================================================
+5. ORGANIZATIONAL ISSUES SUMMARY
+================================================================================
+
+CRITICAL ISSUES:
+1. ⚠️ Frontend is not properly structured
+   - Monolithic HTML files instead of modular components
+   - No build pipeline
+   - Multiple prototype versions causing confusion
+   - Maintenance will become problematic
+
+2. ⚠️ Documentation is scattered
+   - Process artifacts (reports, PR docs) in root
+   - No clear documentation hierarchy
+   - Hard to navigate for new users/developers
+
+MEDIUM ISSUES:
+3. Frontend documentation location unclear
+4. No clear "current" version designation
+5. No contributor documentation
+
+MINOR ISSUES:
+6. Example config file could be more discoverable
+7. No separate CONTRIBUTING.md file
+
+================================================================================
+6. RECOMMENDATIONS (BY PRIORITY)
+================================================================================
+
+IMMEDIATE (Week 1):
+1. Reorganize documentation:
+   - Create docs/ directory
+   - Move guides and specs to docs/
+   - Update root README.md with links
+   - Archive PR and test reports (if not needed)
+
+2. Frontend cleanup:
+   - Designate v4 as current version
+   - Archive v1, v2, v3 in versioning system (git tags)
+   - Delete duplicate HTML files OR move to archive/
+
+NEAR-TERM (Week 2-3):
+3. Build proper frontend structure:
+   - Create frontend/ with src/, public/, package.json
+   - Separate CSS and JavaScript from HTML
+   - Set up build pipeline (Vite/Webpack)
+   - Configure proper development workflow
+
+4. Create CONTRIBUTING.md:
+   - Development setup
+   - Code style guide reference
+   - Pull request process
+   - Testing requirements
+
+MEDIUM-TERM (Month 2):
+5. Modularize frontend:
+   - Convert to proper React app structure
+   - Create reusable components
+   - Implement state management
+   - Add testing framework
+
+6. Enhance developer documentation:
+   - Architecture diagrams
+   - API endpoint examples
+   - Common development tasks
+   - Debugging guide
+
+================================================================================
+7. ASSET INVENTORY BY TYPE
+================================================================================
+
+EXECUTABLE/RUNTIME:
+  - dist/server.js (generated from TypeScript, ~2000 LOC)
+  
+BUILD ARTIFACTS (generated, not in git):
+  - dist/ directory (compiled JavaScript)
+  - node_modules/ (dependencies)
+  - *.tsbuildinfo (TypeScript build info)
+  
+SOURCE CODE:
+  Backend (src/):
+    - 83 TypeScript files
+    - Fully modular and reusable
+  
+  Frontend (frontend/):
+    - 7 HTML files
+    - Not modular (monolithic)
+    
+STATIC RESOURCES:
+  - No separate CSS files (embedded in HTML)
+  - No image assets (not found in scan)
+  - No font files (likely loaded from CDN)
+
+================================================================================
+8. GIT CONSIDERATIONS
+================================================================================
+
+Current Branch: claude/organize-project-structure-01T3QR7om6B67aP9dKPtsqdJ
+
+Files to Track:
+  - All src/ files ✓
+  - All frontend/ HTML files ✓
+  - Documentation/ markdown files ✓
+  - Configuration files ✓
+
+Files to Exclude (.gitignore):
+  - node_modules/ ✓
+  - dist/ ✓
+  - .env ✓ (only track .env.example)
+  - Build artifacts ✓
+
+Potential Reorganization Impact:
+  - Renaming frontend files would break git history
+  - Consider using git mv for reorganization
+  - Document structure changes in commit message
+
+================================================================================
+9. DEPLOYMENT CONSIDERATIONS
+================================================================================
+
+Current Deployment Method:
+  - Docker container (multi-stage build)
+  - Metrics exposed on port 9090
+  - Server runs on stdio (JSON-RPC)
+
+Frontend Deployment:
+  - Currently: static HTML files (serve as-is)
+  - Problem: Not suitable for development iteration
+  - After reorganization: Use npm build pipeline
+  - Deploy: Static file hosting (GitHub Pages, Vercel, Netlify, etc.)
+
+Backend Deployment:
+  - Currently: MCP server via Docker
+  - Suitable for: Claude Desktop, other MCP clients
+  - Scalability: Horizontal with load balancer
+
+================================================================================
+10. CONCLUSION
+================================================================================
+
+Current State:
+  Backend (src/): WELL-ORGANIZED ✓
+    - Clear layered architecture
+    - Consistent naming conventions
+    - Separation of concerns
+    - Ready for maintenance and extension
+
+  Frontend (frontend/): NEEDS REORGANIZATION ✗
+    - Monolithic single-file apps
+    - No build pipeline
+    - Difficult to maintain
+    - Multiple prototype versions cause confusion
+
+  Documentation: NEEDS REORGANIZATION ✗
+    - Scattered across root directory
+    - Contains process artifacts
+    - No clear hierarchy
+    - Hard to navigate
+
+NEXT STEPS:
+1. Create structure plan for frontend modernization
+2. Reorganize documentation into docs/ directory
+3. Designate current versions for release
+4. Archive/remove obsolete files
+5. Implement modular frontend architecture
+
+================================================================================

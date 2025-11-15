@@ -1,0 +1,54 @@
+# Source files
+src/
+*.ts
+!*.d.ts
+
+# Tests
+**/*.test.ts
+**/*.spec.ts
+**/__tests__/
+coverage/
+
+# Development
+.env
+.env.local
+.env.development
+.env.test
+.vscode/
+.idea/
+*.log
+npm-debug.log*
+
+# Documentation (keep only essential)
+docs/testing/
+docs/process/
+frontend/
+*.md
+!README.md
+
+# Build artifacts
+node_modules/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Docker (keep Dockerfile for reference)
+docker-compose.yml
+.dockerignore
+
+# Misc
+TODO.md
+CHANGELOG.md
+PROJECT_STRUCTURE_ANALYSIS.txt
+FILE_TREE_REFERENCE.txt

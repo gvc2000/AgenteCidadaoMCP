@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Câmara BR - Streaming Client Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-primary:disabled, .btn-secondary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status.idle {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #90caf9;
+        }
+
+        .status.streaming {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #ffb74d;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #388e3c;
+            border: 1px solid #81c784;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #ef5350;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid currentColor;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .event {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border-left: 3px solid;
+        }
+
+        .event.start {
+            background: rgba(33, 150, 243, 0.1);
+            border-color: #2196f3;
+        }
+
+        .event.progress {
+            background: rgba(255, 152, 0, 0.1);
+            border-color: #ff9800;
+        }
+
+        .event.data, .event.chunk {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4caf50;
+        }
+
+        .event.complete {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: #4caf50;
+        }
+
+        .event.error {
+            background: rgba(244, 67, 54, 0.1);
+            border-color: #f44336;
+        }
+
+        .event-type {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 11px;
+            margin-bottom: 5px;
+            opacity: 0.8;
+        }
+
+        .event-data {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MCP Câmara BR - Streaming Client</h1>
+            <p class="subtitle">Demonstração de Server-Sent Events (SSE)</p>
+        </header>
+
+        <div class="content">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="serverUrl">URL do Servidor:</label>
+                    <input type="text" id="serverUrl" value="http://localhost:9090" placeholder="http://localhost:9090">
+                </div>
+
+                <div class="control-group">
+                    <label for="toolName">Nome da Ferramenta:</label>
+                    <select id="toolName">
+                        <option value="buscar_deputados">buscar_deputados</option>
+                        <option value="detalhar_deputado">detalhar_deputado</option>
+                        <option value="buscar_proposicoes">buscar_proposicoes</option>
+                        <option value="detalhar_proposicao">detalhar_proposicao</option>
+                        <option value="buscar_votacoes">buscar_votacoes</option>
+                        <option value="buscar_eventos">buscar_eventos</option>
+                    </select>
+                </div>
+
+                <div class="control-group" style="grid-column: 1 / -1;">
+                    <label for="toolArgs">Argumentos (JSON):</label>
+                    <textarea id="toolArgs" placeholder='{"uf": "SP", "pagina": 1, "itens": 10}'>{"uf": "SP", "pagina": 1, "itens": 10}</textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" id="startBtn" onclick="startStreaming()">Iniciar Streaming</button>
+                <button class="btn-secondary" id="stopBtn" onclick="stopStreaming()" disabled>Parar Streaming</button>
+                <button class="btn-secondary" onclick="clearOutput()">Limpar</button>
+            </div>
+
+            <div id="statusBar" class="status idle">
+                <span>Aguardando...</span>
+            </div>
+
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Eventos Recebidos</div>
+                    <div class="metric-value" id="eventCount">0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Chunks Recebidos</div>
+                    <div class="metric-value" id="chunkCount">0</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Tempo Decorrido</div>
+                    <div class="metric-value" id="elapsed">0s</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Dados Recebidos</div>
+                    <div class="metric-value" id="dataSize">0 KB</div>
+                </div>
+            </div>
+
+            <div class="output" id="output"></div>
+        </div>
+    </div>
+
+    <script>
+        let eventSource = null;
+        let startTime = null;
+        let eventCount = 0;
+        let chunkCount = 0;
+        let totalDataSize = 0;
+        let elapsedInterval = null;
+        let receivedChunks = [];
+
+        function updateStatus(message, type = 'idle') {
+            const statusBar = document.getElementById('statusBar');
+            statusBar.className = `status ${type}`;
+
+            let icon = '';
+            if (type === 'streaming') {
+                icon = '<span class="spinner"></span>';
+            } else if (type === 'success') {
+                icon = '✓';
+            } else if (type === 'error') {
+                icon = '✗';
+            }
+
+            statusBar.innerHTML = `${icon} ${message}`;
+        }
+
+        function addEvent(eventType, data) {
+            const output = document.getElementById('output');
+            const eventDiv = document.createElement('div');
+            eventDiv.className = `event ${eventType}`;
+
+            const typeDiv = document.createElement('div');
+            typeDiv.className = 'event-type';
+            typeDiv.textContent = eventType;
+
+            const dataDiv = document.createElement('div');
+            dataDiv.className = 'event-data';
+            dataDiv.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+
+            eventDiv.appendChild(typeDiv);
+            eventDiv.appendChild(dataDiv);
+            output.insertBefore(eventDiv, output.firstChild);
+
+            eventCount++;
+            document.getElementById('eventCount').textContent = eventCount;
+
+            const dataStr = JSON.stringify(data);
+            totalDataSize += new Blob([dataStr]).size;
+            document.getElementById('dataSize').textContent = (totalDataSize / 1024).toFixed(2) + ' KB';
+        }
+
+        function updateElapsed() {
+            if (startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('elapsed').textContent = elapsed + 's';
+            }
+        }
+
+        async function startStreaming() {
+            const serverUrl = document.getElementById('serverUrl').value;
+            const toolName = document.getElementById('toolName').value;
+            const argsText = document.getElementById('toolArgs').value;
+
+            let args;
+            try {
+                args = JSON.parse(argsText);
+            } catch (e) {
+                updateStatus('Erro: JSON inválido nos argumentos', 'error');
+                return;
+            }
+
+            // Reset metrics
+            eventCount = 0;
+            chunkCount = 0;
+            totalDataSize = 0;
+            receivedChunks = [];
+            startTime = Date.now();
+
+            document.getElementById('eventCount').textContent = '0';
+            document.getElementById('chunkCount').textContent = '0';
+            document.getElementById('elapsed').textContent = '0s';
+            document.getElementById('dataSize').textContent = '0 KB';
+
+            // Start elapsed timer
+            elapsedInterval = setInterval(updateElapsed, 1000);
+
+            updateStatus('Conectando ao servidor...', 'streaming');
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+
+            // Use fetch to POST and get stream
+            try {
+                const response = await fetch(`${serverUrl}/api/tools/${toolName}/stream`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(args)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                updateStatus('Streaming ativo...', 'streaming');
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+
+                    if (done) {
+                        break;
+                    }
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n\n');
+
+                    // Keep the last incomplete message in the buffer
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+
+                        const eventMatch = line.match(/^event: (.+)$/m);
+                        const dataMatch = line.match(/^data: (.+)$/m);
+
+                        if (eventMatch && dataMatch) {
+                            const eventType = eventMatch[1];
+                            let eventData;
+
+                            try {
+                                eventData = JSON.parse(dataMatch[1]);
+                            } catch (e) {
+                                eventData = dataMatch[1];
+                            }
+
+                            handleEvent(eventType, eventData);
+                        }
+                    }
+                }
+
+                updateStatus('Streaming concluído com sucesso', 'success');
+            } catch (error) {
+                console.error('Streaming error:', error);
+                updateStatus(`Erro: ${error.message}`, 'error');
+                addEvent('error', { message: error.message });
+            } finally {
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                if (elapsedInterval) {
+                    clearInterval(elapsedInterval);
+                    elapsedInterval = null;
+                }
+            }
+        }
+
+        function handleEvent(eventType, eventData) {
+            addEvent(eventType, eventData);
+
+            switch (eventType) {
+                case 'start':
+                    updateStatus(`Iniciando execução: ${eventData.tool}`, 'streaming');
+                    break;
+
+                case 'progress':
+                    updateStatus(`Progresso: ${eventData.message}`, 'streaming');
+                    break;
+
+                case 'chunk':
+                    chunkCount++;
+                    document.getElementById('chunkCount').textContent = chunkCount;
+                    receivedChunks.push(eventData.chunk);
+                    updateStatus(`Recebendo chunks: ${eventData.index + 1}/${eventData.total}`, 'streaming');
+
+                    if (eventData.isLast) {
+                        const fullData = receivedChunks.join('');
+                        try {
+                            const parsed = JSON.parse(fullData);
+                            addEvent('data', parsed);
+                        } catch (e) {
+                            console.error('Error parsing chunked data:', e);
+                        }
+                        receivedChunks = [];
+                    }
+                    break;
+
+                case 'data':
+                    updateStatus('Dados recebidos', 'streaming');
+                    break;
+
+                case 'complete':
+                    updateStatus(`Concluído em ${eventData.metadata.executionTime}ms`, 'success');
+                    break;
+
+                case 'error':
+                    updateStatus(`Erro: ${eventData.message}`, 'error');
+                    break;
+            }
+        }
+
+        function stopStreaming() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+
+            if (elapsedInterval) {
+                clearInterval(elapsedInterval);
+                elapsedInterval = null;
+            }
+
+            updateStatus('Streaming interrompido', 'idle');
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+        }
+
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+            eventCount = 0;
+            chunkCount = 0;
+            totalDataSize = 0;
+            document.getElementById('eventCount').textContent = '0';
+            document.getElementById('chunkCount').textContent = '0';
+            document.getElementById('dataSize').textContent = '0 KB';
+            updateStatus('Aguardando...', 'idle');
+        }
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            stopStreaming();
+        });
+    </script>
+</body>
+</html>

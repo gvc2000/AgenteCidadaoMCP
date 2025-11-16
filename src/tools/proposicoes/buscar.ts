@@ -10,8 +10,7 @@ const BuscarProposicoesSchema = z.object({
   siglaTipo: z.string().optional(),
   numero: z.number().int().positive().optional(),
   ano: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
-  idAutor: z.number().int().positive().optional(),
-  nomeAutor: z.string().optional(),
+  idDeputadoAutor: z.number().int().positive().optional(),
   siglaPartidoAutor: z.string().optional(),
   siglaUfAutor: UFEnum.optional(),
   keywords: z.string().optional(),
@@ -77,15 +76,14 @@ export async function buscarProposicoes(params: BuscarProposicoesParams) {
 
 export const buscarProposicoesTool = {
   name: 'buscar_proposicoes',
-  description: 'Busca proposições legislativas (PLs, PECs, MPs, etc.) por diversos critérios',
+  description: 'Busca proposições legislativas (PLs, PECs, MPs, etc.) por diversos critérios, incluindo busca por autor específico (deputado)',
   inputSchema: {
     type: 'object',
     properties: {
       siglaTipo: { type: 'string', description: 'Sigla do tipo (PL, PEC, MPV, etc.)' },
       numero: { type: 'number', description: 'Número da proposição' },
       ano: { type: 'number', description: 'Ano da proposição' },
-      idAutor: { type: 'number', description: 'ID do autor' },
-      nomeAutor: { type: 'string', description: 'Nome do autor' },
+      idDeputadoAutor: { type: 'number', description: 'ID do deputado autor da proposição. Use buscar_deputados para obter o ID.' },
       siglaPartidoAutor: { type: 'string', description: 'Sigla do partido do autor' },
       siglaUfAutor: { type: 'string', description: 'UF do autor' },
       keywords: { type: 'string', description: 'Palavras-chave' },

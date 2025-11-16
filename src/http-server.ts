@@ -413,7 +413,7 @@ app.use((err: Error, req: Request, res: Response, _next: any) => {
 // Start server
 async function main() {
   try {
-    const port = process.env.PORT || CONFIG.metrics.port || 9090;
+    const port = parseInt(process.env.PORT || String(CONFIG.metrics.port || 9090), 10);
 
     logger.info('Starting MCP Câmara BR HTTP Server...');
     logger.info({
@@ -426,13 +426,13 @@ async function main() {
       toolsCount: allTools.length
     }, 'Configuration loaded');
 
-    app.listen(port, () => {
+    app.listen(port, '0.0.0.0', () => {
       logger.info(`🚀 HTTP Server listening on port ${port}`);
       logger.info(`📊 Tools available: ${allTools.length}`);
-      logger.info(`🔗 Base URL: http://localhost:${port}`);
-      logger.info(`❤️  Health check: http://localhost:${port}/health`);
-      logger.info(`📋 Tools list: http://localhost:${port}/api/tools`);
-      logger.info(`📈 Metrics: http://localhost:${port}/metrics`);
+      logger.info(`🔗 Base URL: http://0.0.0.0:${port}`);
+      logger.info(`❤️  Health check: http://0.0.0.0:${port}/health`);
+      logger.info(`📋 Tools list: http://0.0.0.0:${port}/api/tools`);
+      logger.info(`📈 Metrics: http://0.0.0.0:${port}/metrics`);
 
       logger.info('\nRegistered tools:');
       allTools.forEach(tool => {

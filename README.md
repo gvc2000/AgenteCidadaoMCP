@@ -50,8 +50,9 @@ Edite o arquivo de configuração:
 ~/.config/Claude/claude_desktop_config.json
 ```
 
-Adicione:
+Adicione a configuração:
 
+**macOS/Linux:**
 ```json
 {
   "mcpServers": {
@@ -63,6 +64,20 @@ Adicione:
 }
 ```
 
+**Windows (use barras duplas `\\`):**
+```json
+{
+  "mcpServers": {
+    "camara-br": {
+      "command": "node",
+      "args": ["C:\\Users\\SeuUsuario\\AgenteCidadaoMCP\\dist\\server.js"]
+    }
+  }
+}
+```
+
+> **⚠️ Importante para Windows:** Use **barras duplas (`\\`)** nos caminhos. Veja o [Guia Windows](./GUIA_INSTALACAO_WINDOWS.md) para mais detalhes.
+
 ### 4. Reiniciar Claude Desktop
 
 Feche e abra o Claude Desktop novamente.
@@ -71,6 +86,14 @@ Feche e abra o Claude Desktop novamente.
 
 - Node.js >= 20.0.0
 - npm ou yarn
+
+## 📖 Guias de Instalação Detalhados
+
+Escolha o guia apropriado para seu sistema operacional:
+
+- **Windows 11/10**: Veja o [Guia de Instalação para Windows](./GUIA_INSTALACAO_WINDOWS.md)
+- **macOS/Linux**: Continue com as instruções abaixo ou veja o [Guia de Instalação Completo](./GUIA_INSTALACAO_USO.md)
+- **Início Rápido**: Para desenvolvedores experientes, veja [Início Rápido](./INICIO_RAPIDO.md)
 
 ## Instalação Completa
 

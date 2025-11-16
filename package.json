@@ -10,11 +10,13 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "dev:http": "tsx watch src/http-server.ts",
+    "dev:sse": "tsx watch src/mcp-sse-server.ts",
     "build": "tsc",
     "build:unix": "tsc && chmod +x dist/server.js",
     "build:clean": "npm run clean && npm run build",
     "start": "node dist/server.js",
     "start:http": "node dist/http-server.js",
+    "start:sse": "node dist/mcp-sse-server.js",
     "clean": "rimraf dist",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
@@ -59,27 +61,29 @@
   ],
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
+    "@types/cors": "^2.8.19",
     "axios": "^1.6.0",
-    "zod": "^3.22.0",
-    "lru-cache": "^10.0.0",
-    "pino": "^8.16.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.0",
-    "p-retry": "^6.0.0",
+    "express": "^4.18.0",
+    "lru-cache": "^10.0.0",
     "p-queue": "^7.4.0",
-    "express": "^4.18.0"
+    "p-retry": "^6.0.0",
+    "pino": "^8.16.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
     "@types/express": "^4.17.0",
-    "typescript": "^5.2.0",
-    "vitest": "^1.0.0",
-    "nock": "^13.4.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
     "eslint": "^8.52.0",
+    "nock": "^13.4.0",
     "prettier": "^3.0.0",
     "rimraf": "^5.0.0",
     "tsx": "^4.7.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0"
+    "typescript": "^5.2.0",
+    "vitest": "^1.0.0"
   },
   "engines": {
     "node": ">=20.0.0"

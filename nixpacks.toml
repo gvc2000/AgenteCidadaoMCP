@@ -1,2 +1,2 @@
 [start]
-cmd = "node dist/http-server.js"
+cmd = "node dist/mcp-sse-server.js"

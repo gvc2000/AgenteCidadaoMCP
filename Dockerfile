@@ -34,8 +34,8 @@ COPY --from=builder /app/dist ./dist
 # Copy .env.example as .env
 COPY .env.example .env
 
-# Environment variable to choose mode (stdio or http)
-ENV SERVER_MODE=http
+# Environment variable to choose mode (stdio, http, or mcp-sse)
+ENV SERVER_MODE=mcp-sse
 
 # Expose HTTP port
 EXPOSE 9090
@@ -43,5 +43,5 @@ EXPOSE 9090
 # Use tini to handle signals properly
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Start the HTTP server by default (for Railway/n8n)
-CMD ["node", "dist/http-server.js"]
+# Start the MCP SSE server by default (for Railway/n8n)
+CMD ["node", "dist/mcp-sse-server.js"]

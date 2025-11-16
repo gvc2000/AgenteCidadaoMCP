@@ -9,6 +9,7 @@ O **mcp-camara-br** é um servidor MCP que expõe todas as funcionalidades da AP
 ### Características
 
 - ✅ **Cobertura Completa** - Mapeia os principais endpoints da API da Câmara
+- ✅ **HTTP Streaming** - Suporte a Server-Sent Events (SSE) para streaming de dados
 - ✅ **Validação Rigorosa** - Inputs validados com Zod
 - ✅ **Cache Inteligente** - Sistema de cache em camadas com TTL diferenciado
 - ✅ **Rate Limiting** - Proteção contra sobrecarga da API
@@ -107,6 +108,49 @@ docker-compose logs -f
 # Parar
 docker-compose down
 ```
+
+## Uso via HTTP (API REST)
+
+O servidor também pode ser executado em modo HTTP, expondo uma API REST com suporte a streaming:
+
+```bash
+# Executar servidor HTTP
+npm run start:http
+
+# Ou em desenvolvimento com hot-reload
+npm run dev:http
+```
+
+### Endpoints HTTP
+
+- `GET /` - Informações da API
+- `GET /api/tools` - Lista todas as ferramentas disponíveis
+- `POST /api/tools/:toolName` - Executa uma ferramenta (resposta completa)
+- `POST /api/tools/:toolName/stream` - Executa uma ferramenta com streaming (SSE)
+- `GET /health` - Health check
+- `GET /metrics` - Métricas Prometheus
+- `GET /metrics/json` - Métricas em JSON
+
+### Exemplo de Uso HTTP
+
+```bash
+# Buscar deputados (resposta completa)
+curl -X POST http://localhost:9090/api/tools/buscar_deputados \
+  -H "Content-Type: application/json" \
+  -d '{"uf":"SP","pagina":1,"itens":10}'
+
+# Buscar deputados com streaming (SSE)
+curl -X POST http://localhost:9090/api/tools/buscar_deputados/stream \
+  -H "Content-Type: application/json" \
+  -d '{"uf":"SP","pagina":1,"itens":10}' \
+  --no-buffer
+```
+
+### Cliente Interativo
+
+Um cliente HTML interativo está disponível em `examples/streaming-client.html`. Abra o arquivo em um navegador para testar o streaming em tempo real.
+
+Para mais informações sobre streaming, veja [STREAMING.md](STREAMING.md).
 
 ## Configuração
 

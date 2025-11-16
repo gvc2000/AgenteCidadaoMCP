@@ -70,18 +70,61 @@ app.use((req, res, next) => {
   next();
 });
 
+// SSE Helper Functions
+interface SSEMessage {
+  event?: string;
+  data: any;
+  id?: string;
+  retry?: number;
+}
+
+function sendSSE(res: Response, message: SSEMessage): void {
+  if (message.event) {
+    res.write(`event: ${message.event}\n`);
+  }
+  if (message.id) {
+    res.write(`id: ${message.id}\n`);
+  }
+  if (message.retry) {
+    res.write(`retry: ${message.retry}\n`);
+  }
+
+  const data = typeof message.data === 'string' ? message.data : JSON.stringify(message.data);
+  res.write(`data: ${data}\n\n`);
+}
+
+function initSSE(res: Response): void {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*',
+    'X-Accel-Buffering': 'no' // Disable nginx buffering
+  });
+
+  // Send initial comment to establish connection
+  res.write(': connected\n\n');
+}
+
 // Root endpoint
 app.get('/', (_req: Request, res: Response) => {
   res.json({
     name: 'MCP Câmara BR - HTTP API',
     version: '1.0.0',
-    description: 'API HTTP para dados da Câmara dos Deputados do Brasil',
+    description: 'API HTTP para dados da Câmara dos Deputados do Brasil com suporte a streaming',
     endpoints: {
       tools: 'GET /api/tools - Lista todas as ferramentas disponíveis',
-      call: 'POST /api/tools/:toolName - Executa uma ferramenta específica',
+      call: 'POST /api/tools/:toolName - Executa uma ferramenta específica (resposta completa)',
+      stream: 'POST /api/tools/:toolName/stream - Executa uma ferramenta com streaming (SSE)',
       health: 'GET /health - Health check',
       metrics: 'GET /metrics - Métricas Prometheus',
       metricsJson: 'GET /metrics/json - Métricas em JSON'
+    },
+    features: {
+      streaming: 'Suporte a Server-Sent Events (SSE) para respostas em streaming',
+      caching: 'Cache multinível com TTLs diferenciados',
+      rateLimit: 'Rate limiting com algoritmo token bucket',
+      metrics: 'Métricas Prometheus para monitoramento'
     },
     documentation: 'https://github.com/gvc2000/AgenteCidadaoMCP'
   });
@@ -187,6 +230,144 @@ app.post('/api/tools/:toolName', async (req: Request, res: Response): Promise<vo
   }
 });
 
+// Execute a specific tool with streaming (SSE)
+app.post('/api/tools/:toolName/stream', async (req: Request, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  const { toolName } = req.params;
+  const args = req.body || {};
+
+  logger.info({ tool: toolName, args }, `Tool called via HTTP streaming: ${toolName}`);
+
+  // Initialize SSE connection
+  initSSE(res);
+
+  // Handle client disconnect
+  req.on('close', () => {
+    logger.info({ tool: toolName }, 'Client disconnected from stream');
+  });
+
+  try {
+    // Send start event
+    sendSSE(res, {
+      event: 'start',
+      data: {
+        tool: toolName,
+        timestamp: new Date().toISOString()
+      }
+    });
+
+    // Find the tool
+    const tool = allTools.find(t => t.name === toolName);
+
+    if (!tool) {
+      sendSSE(res, {
+        event: 'error',
+        data: {
+          success: false,
+          error: 'Tool not found',
+          message: `Tool '${toolName}' does not exist`,
+          availableTools: allTools.map(t => t.name)
+        }
+      });
+      res.end();
+      return;
+    }
+
+    // Send progress event
+    sendSSE(res, {
+      event: 'progress',
+      data: {
+        message: 'Executing tool...',
+        progress: 0.5
+      }
+    });
+
+    // Execute the tool
+    const result = await tool.handler(args);
+
+    // Metrics
+    const duration = Date.now() - startTime;
+    metricsCollector.incrementToolCall(toolName);
+    metricsCollector.recordLatency(toolName, duration);
+
+    logger.info(
+      { tool: toolName, duration },
+      `Tool completed via HTTP streaming: ${toolName} in ${duration}ms`
+    );
+
+    // Send result in chunks for large data
+    const resultStr = JSON.stringify(result);
+    const chunkSize = 1024 * 10; // 10KB chunks
+
+    if (resultStr.length > chunkSize) {
+      // Send large result in chunks
+      const chunks = Math.ceil(resultStr.length / chunkSize);
+
+      for (let i = 0; i < chunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, resultStr.length);
+        const chunk = resultStr.slice(start, end);
+        const isLast = i === chunks - 1;
+
+        sendSSE(res, {
+          event: 'chunk',
+          data: {
+            chunk,
+            index: i,
+            total: chunks,
+            isLast
+          }
+        });
+      }
+    } else {
+      // Send small result directly
+      sendSSE(res, {
+        event: 'data',
+        data: result
+      });
+    }
+
+    // Send completion event
+    sendSSE(res, {
+      event: 'complete',
+      data: {
+        success: true,
+        tool: toolName,
+        metadata: {
+          executionTime: duration,
+          timestamp: new Date().toISOString()
+        }
+      }
+    });
+
+    res.end();
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    logger.error({ tool: toolName, error, duration }, `Tool error via HTTP streaming: ${toolName}`);
+    metricsCollector.incrementError(toolName);
+
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    sendSSE(res, {
+      event: 'error',
+      data: {
+        success: false,
+        error: 'Tool execution failed',
+        tool: toolName,
+        message: errorMessage,
+        ...(CONFIG.development.nodeEnv === 'development' && { stack: errorStack }),
+        metadata: {
+          executionTime: duration,
+          timestamp: new Date().toISOString()
+        }
+      }
+    });
+
+    res.end();
+  }
+});
+
 // Prometheus metrics endpoint
 app.get('/metrics', (_req: Request, res: Response) => {
   res.set('Content-Type', 'text/plain');
@@ -208,6 +389,7 @@ app.use((req: Request, res: Response) => {
       root: 'GET /',
       tools: 'GET /api/tools',
       call: 'POST /api/tools/:toolName',
+      stream: 'POST /api/tools/:toolName/stream',
       health: 'GET /health',
       metrics: 'GET /metrics',
       metricsJson: 'GET /metrics/json'

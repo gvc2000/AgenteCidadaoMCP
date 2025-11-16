@@ -34,11 +34,14 @@ COPY --from=builder /app/dist ./dist
 # Copy .env.example as .env
 COPY .env.example .env
 
-# Expose metrics port
+# Environment variable to choose mode (stdio or http)
+ENV SERVER_MODE=http
+
+# Expose HTTP port
 EXPOSE 9090
 
 # Use tini to handle signals properly
 ENTRYPOINT ["/sbin/tini", "--"]
 
-# Start the server
-CMD ["node", "dist/server.js"]
+# Start the HTTP server by default (for Railway/n8n)
+CMD ["node", "dist/http-server.js"]

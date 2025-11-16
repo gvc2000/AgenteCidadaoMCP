@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { CamaraMCPServer } from './mcp.js';
 import { logger } from './core/logging.js';
 import { CONFIG } from './config.js';

@@ -191,7 +191,7 @@ async function main() {
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('despesas_deputado', 'Despesas 2023', () => despesasDeputado({ id: 204554, ano: 2023, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('despesas_deputado', 'Ordenado por valor', () => despesasDeputado({ id: 204554, ano: 2024, itens: 5, ordenarPor: 'valor', ordem: 'DESC' }));
+  await runTest('despesas_deputado', 'Ordenado por valor', () => despesasDeputado({ id: 204554, ano: 2024, itens: 5, ordenarPor: 'valorDocumento', ordem: 'DESC' }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ndiscursos_deputado:');

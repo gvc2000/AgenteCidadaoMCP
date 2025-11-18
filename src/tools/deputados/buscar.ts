@@ -43,7 +43,7 @@ export async function buscarDeputados(params: BuscarDeputadosParams) {
     if (validated.nome) apiParams.nome = validated.nome;
     if (validated.uf) apiParams.siglaUf = validated.uf;
     if (validated.partido) apiParams.siglaPartido = validated.partido;
-    if (validated.sexo) apiParams.sexo = validated.sexo;
+    if (validated.sexo) apiParams.siglaSexo = validated.sexo;
     if (validated.idLegislatura) apiParams.idLegislatura = validated.idLegislatura;
     if (validated.dataInicio) apiParams.dataInicio = validated.dataInicio;
     if (validated.dataFim) apiParams.dataFim = validated.dataFim;

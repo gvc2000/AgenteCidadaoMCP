@@ -15,7 +15,7 @@ const DespesasDeputadoSchema = z.object({
   pagina: z.number().int().positive().default(1).optional(),
   itens: z.number().int().min(1).max(100).default(25).optional(),
   ordem: OrdemEnum.default('DESC').optional(),
-  ordenarPor: z.enum(['ano', 'mes', 'valor']).optional()
+  ordenarPor: z.enum(['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']).optional()
 });
 
 export type DespesasDeputadoParams = z.infer<typeof DespesasDeputadoSchema>;
@@ -137,7 +137,7 @@ export const despesasDeputadoTool = {
       ordenarPor: {
         type: 'string',
         description: 'Campo para ordenação',
-        enum: ['ano', 'mes', 'valor']
+        enum: ['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']
       }
     },
     required: ['id']

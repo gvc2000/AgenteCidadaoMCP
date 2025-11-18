@@ -58,6 +58,9 @@ echo ""
 PASSED=0
 FAILED=0
 
+# Delay entre testes (em segundos)
+DELAY=3
+
 # Função para rodar teste e contar
 run_test() {
     if test_tool "$1" "$2" "$3"; then
@@ -65,6 +68,9 @@ run_test() {
     else
         ((FAILED++))
     fi
+    # Aguardar entre testes para não sobrecarregar o servidor
+    echo "⏳ Aguardando ${DELAY}s..."
+    sleep $DELAY
 }
 
 # ============================================

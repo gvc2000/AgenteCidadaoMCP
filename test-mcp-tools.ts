@@ -191,7 +191,7 @@ async function main() {
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('despesas_deputado', 'Despesas 2023', () => despesasDeputado({ id: 204554, ano: 2023, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('despesas_deputado', 'Ordenado por valor', () => despesasDeputado({ id: 204554, ano: 2024, itens: 5, ordenarPor: 'valorDocumento', ordem: 'DESC' }));
+  await runTest('despesas_deputado', 'Ordenado por valor', () => despesasDeputado({ id: 204554, ano: 2024, itens: 5, ordenarPor: 'valor', ordem: 'DESC' }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ndiscursos_deputado:');
@@ -751,15 +751,15 @@ async function main() {
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nmesa_legislatura:');
-  await runTest('mesa_legislatura', 'Mesa 57', () => mesaLegislatura({ id: 57 }));
+  await runTest('mesa_legislatura', 'Mesa 57', () => mesaLegislatura({ idLegislatura: 57 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('mesa_legislatura', 'Mesa 56', () => mesaLegislatura({ id: 56 }));
+  await runTest('mesa_legislatura', 'Mesa 56', () => mesaLegislatura({ idLegislatura: 56 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('mesa_legislatura', 'Mesa 55', () => mesaLegislatura({ id: 55 }));
+  await runTest('mesa_legislatura', 'Mesa 55', () => mesaLegislatura({ idLegislatura: 55 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('mesa_legislatura', 'Mesa 54', () => mesaLegislatura({ id: 54 }));
+  await runTest('mesa_legislatura', 'Mesa 54', () => mesaLegislatura({ idLegislatura: 54 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('mesa_legislatura', 'ID inexistente', () => mesaLegislatura({ id: 999 }));
+  await runTest('mesa_legislatura', 'ID inexistente', () => mesaLegislatura({ idLegislatura: 999 }));
 
   await sleep(DELAY_BETWEEN_GROUPS);
 

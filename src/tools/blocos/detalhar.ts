@@ -1,11 +1,16 @@
 import { z } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
-import { IdSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
 
-const DetalharBlocoSchema = z.object({ id: IdSchema });
+// Blocos usam IDs que podem ser números ou strings (ex: "PP , REPUBLICANOS")
+const BlocoIdSchema = z.union([
+  z.number().int().positive(),
+  z.string().min(1)
+]);
+
+const DetalharBlocoSchema = z.object({ id: BlocoIdSchema });
 export type DetalharBlocoParams = z.infer<typeof DetalharBlocoSchema>;
 
 export async function detalharBloco(params: DetalharBlocoParams) {
@@ -35,7 +40,7 @@ export const detalharBlocoTool = {
   description: 'Obtém detalhes de um bloco parlamentar específico',
   inputSchema: {
     type: 'object',
-    properties: { id: { type: 'number', description: 'ID do bloco' } },
+    properties: { id: { oneOf: [{ type: 'number' }, { type: 'string' }], description: 'ID do bloco (número ou string)' } },
     required: ['id']
   },
   handler: detalharBloco

@@ -182,9 +182,14 @@ METRICS_ENABLED=true
 METRICS_PORT=9090
 ```
 
-## 🛠️ Tools Disponíveis
+## 🛠️ Tools Disponíveis (57 tools)
 
-### Deputados
+### Tools de Ajuda
+
+- `sugerir_ferramentas` - Sugere quais tools usar para uma consulta
+- `diagnosticar_consulta` - Analisa objetivo e sugere fluxo completo de tools
+
+### Deputados (9)
 
 - `buscar_deputados` - Busca deputados por nome, UF, partido, etc.
 - `detalhar_deputado` - Informações detalhadas de um deputado
@@ -192,13 +197,85 @@ METRICS_PORT=9090
 - `discursos_deputado` - Discursos proferidos
 - `eventos_deputado` - Eventos que participou
 - `frentes_deputado` - Frentes parlamentares das quais é membro
+- `ocupacoes_deputado` - Histórico de ocupações na Câmara
 - `orgaos_deputado` - Órgãos dos quais é membro
+- `profissoes_deputado` - Profissões declaradas
 
-### Proposições
+### Proposições (7)
 
 - `buscar_proposicoes` - Busca proposições legislativas (PLs, PECs, MPs, etc.)
 - `detalhar_proposicao` - Informações detalhadas de uma proposição
 - `autores_proposicao` - Lista os autores de uma proposição
+- `tramitacoes_proposicao` - Histórico de tramitação
+- `votacoes_proposicao` - Votações da proposição
+- `relacionadas_proposicao` - Proposições relacionadas
+- `temas_proposicao` - Temas/assuntos da proposição
+
+### Votações (5)
+
+- `buscar_votacoes` - Busca votações por período ou proposição
+- `detalhar_votacao` - Resultado geral de uma votação
+- `votos_votacao` - Voto individual de cada deputado
+- `orientacoes_votacao` - Orientação dos partidos
+- `ultimas_votacoes` - Votações mais recentes
+
+### Eventos (6)
+
+- `buscar_eventos` - Busca reuniões e sessões por período
+- `detalhar_evento` - Informações de um evento
+- `deputados_evento` - Deputados presentes
+- `pauta_evento` - Pauta do evento
+- `votacoes_evento` - Votações realizadas
+- `orgaos_evento` - Órgãos participantes
+
+### Órgãos (5)
+
+- `buscar_orgaos` - Busca comissões e órgãos
+- `detalhar_orgao` - Informações de um órgão
+- `membros_orgao` - Composição atual
+- `eventos_orgao` - Eventos do órgão
+- `votacoes_orgao` - Votações do órgão
+
+### Partidos (4)
+
+- `buscar_partidos` - Lista partidos
+- `detalhar_partido` - Informações de um partido
+- `membros_partido` - Deputados do partido
+- `lideres_partido` - Liderança do partido
+
+### Frentes Parlamentares (3)
+
+- `buscar_frentes` - Busca frentes parlamentares
+- `detalhar_frente` - Informações de uma frente
+- `membros_frente` - Membros da frente
+
+### Blocos (2)
+
+- `buscar_blocos` - Busca blocos partidários
+- `detalhar_bloco` - Informações de um bloco
+
+### Legislaturas (3)
+
+- `buscar_legislaturas` - Lista legislaturas
+- `detalhar_legislatura` - Informações de uma legislatura
+- `mesa_legislatura` - Mesa Diretora
+
+### Referências (5)
+
+- `situacoes_proposicao` - Situações possíveis de proposições
+- `tipos_proposicao` - Tipos de proposições (PL, PEC, etc.)
+- `tipos_orgao` - Tipos de órgãos da Câmara
+- `tipos_evento` - Tipos de eventos
+- `ufs` - Unidades Federativas
+
+### Análises (6)
+
+- `analise_presenca` - Taxa de presença de deputados
+- `ranking_proposicoes` - Ranking de proposições
+- `analise_despesas_partido` - Despesas agregadas por partido
+- `comparativo_votacoes` - Compara votações
+- `timeline_tramitacao` - Timeline de tramitação
+- `exportar_dados` - Exporta dados para CSV/JSON
 
 ## 💬 Exemplos de Uso
 

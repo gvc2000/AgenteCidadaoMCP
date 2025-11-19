@@ -31,7 +31,7 @@ export async function situacoesProposicao(params: SituacoesProposicaoParams = {}
 
 export const situacoesProposicaoTool = {
   name: 'situacoes_proposicao',
-  description: 'Lista as situações possíveis de proposições legislativas',
+  description: 'Lista as situações possíveis de proposições legislativas (tramitando, arquivada, aprovada, etc). Use esta tool para obter o ID ou sigla de uma situação quando precisar filtrar proposições por status em buscar_proposicoes. Exemplos de uso: encontrar proposições em tramitação, listar PLs arquivados, buscar PECs aprovadas.',
   inputSchema: { type: 'object', properties: {} },
   handler: situacoesProposicao
 };

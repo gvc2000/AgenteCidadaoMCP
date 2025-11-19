@@ -34,20 +34,35 @@ class RateLimiter {
       return;
     }
 
-    // Não há tokens suficientes
+    // Não há tokens suficientes - esperar automaticamente
     const waitTime = this.calculateWaitTime(tokens);
 
-    logger.warn({
-      type: 'rate_limit',
-      tokens: this.state.tokens,
-      required: tokens,
-      waitTime
-    }, 'Rate limit reached');
+    // Se o tempo de espera for muito longo (>10s), lançar exceção
+    if (waitTime > 10000) {
+      logger.warn({
+        type: 'rate_limit',
+        tokens: this.state.tokens,
+        required: tokens,
+        waitTime
+      }, 'Rate limit exceeded - wait time too long');
 
-    throw new RateLimitError(
-      `Rate limit exceeded. Try again in ${Math.ceil(waitTime / 1000)}s`,
+      throw new RateLimitError(
+        `Rate limit exceeded. Try again in ${Math.ceil(waitTime / 1000)}s`,
+        waitTime
+      );
+    }
+
+    // Esperar automaticamente para tempos curtos
+    logger.debug({
+      type: 'rate_limit_wait',
       waitTime
-    );
+    }, `Aguardando ${Math.ceil(waitTime)}ms para rate limit`);
+
+    await new Promise(resolve => setTimeout(resolve, waitTime));
+
+    // Após esperar, refill e consumir tokens
+    this.refillTokens();
+    this.state.tokens -= tokens;
   }
 
   private refillTokens(): void {

@@ -31,7 +31,7 @@ export async function tiposEvento(params: TiposEventoParams = {}) {
 
 export const tiposEventoTool = {
   name: 'tipos_evento',
-  description: 'Lista os tipos de eventos da Câmara (reuniões, sessões, etc)',
+  description: 'Lista os tipos de eventos realizados na Câmara. Inclui: sessões plenárias (deliberativas, não deliberativas), reuniões de comissão, audiências públicas, seminários, etc. Use para filtrar eventos específicos em buscar_eventos ou entender a agenda legislativa.',
   inputSchema: { type: 'object', properties: {} },
   handler: tiposEvento
 };

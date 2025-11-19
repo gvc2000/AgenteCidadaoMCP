@@ -7,12 +7,12 @@ export const CONFIG = {
   api: {
     baseUrl: process.env.API_BASE_URL || 'https://dadosabertos.camara.leg.br/api/v2',
     openApiUrl: process.env.OPENAPI_URL || 'https://dadosabertos.camara.leg.br/swagger/api.json',
-    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '30000', 10),
+    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '15000', 10),  // Reduzido para 15s
   },
 
   // Cache Configuration
   cache: {
-    enabled: process.env.CACHE_ENABLED === 'true',
+    enabled: process.env.CACHE_ENABLED !== 'false',  // HABILITADO por padrão
     ttl: parseInt(process.env.CACHE_TTL_SECONDS || '600', 10),
     maxSize: parseInt(process.env.CACHE_MAX_SIZE || '1000', 10),
     strategy: process.env.CACHE_STRATEGY || 'tiered',
@@ -56,9 +56,9 @@ export const CONFIG = {
 
   // Retry Policy
   retry: {
-    maxRetries: parseInt(process.env.MAX_RETRIES || '3', 10),
-    delay: parseInt(process.env.RETRY_DELAY_MS || '1000', 10),
-    jitter: parseInt(process.env.RETRY_JITTER_MS || '500', 10),
+    maxRetries: parseInt(process.env.MAX_RETRIES || '2', 10),  // Reduzido de 3 para 2
+    delay: parseInt(process.env.RETRY_DELAY_MS || '500', 10),  // Reduzido de 1000ms para 500ms
+    jitter: parseInt(process.env.RETRY_JITTER_MS || '250', 10),  // Reduzido de 500ms para 250ms
   },
 
   // Development

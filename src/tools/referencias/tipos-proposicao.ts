@@ -31,7 +31,7 @@ export async function tiposProposicao(params: TiposProposicaoParams = {}) {
 
 export const tiposProposicaoTool = {
   name: 'tipos_proposicao',
-  description: 'Lista os tipos de proposições legislativas (PL, PEC, MPV, etc)',
+  description: 'Lista todos os tipos de proposições legislativas com siglas e descrições. Tipos comuns: PL (Projeto de Lei), PEC (Emenda Constitucional), MPV (Medida Provisória), PDL (Decreto Legislativo), PLP (Lei Complementar). Use para descobrir a sigla correta ao buscar proposições com buscar_proposicoes.',
   inputSchema: { type: 'object', properties: {} },
   handler: tiposProposicao
 };

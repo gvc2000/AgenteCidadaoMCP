@@ -1,10 +1,11 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { DataNormalizer } from '../../api/normalizers.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { createPaginacaoResposta, UFEnum, OrdemEnum, DateSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
+import { formatZodError } from '../../core/errors.js';
 
 const BuscarProposicoesSchema = z.object({
   siglaTipo: z.string().optional(),
@@ -34,7 +35,15 @@ export async function buscarProposicoes(params: BuscarProposicoesParams) {
   const startTime = Date.now();
 
   try {
-    const validated = BuscarProposicoesSchema.parse(params);
+    let validated: BuscarProposicoesParams;
+    try {
+      validated = BuscarProposicoesSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw formatZodError(error);
+      }
+      throw error;
+    }
     const cacheKey = createCacheKey(validated);
     const cached = cacheManager.get<any>('proposicoes', cacheKey);
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
@@ -76,29 +85,101 @@ export async function buscarProposicoes(params: BuscarProposicoesParams) {
 
 export const buscarProposicoesTool = {
   name: 'buscar_proposicoes',
-  description: 'Busca proposições legislativas (PLs, PECs, MPs, etc.) por diversos critérios, incluindo busca por autor específico (deputado)',
+  description: 'Busca proposições legislativas (PLs, PECs, MPs, etc.) por diversos critérios. DICA: Comece com poucos parâmetros (ex: siglaTipo + ano, ou apenas keywords) e adicione filtros gradualmente.',
   inputSchema: {
     type: 'object',
     properties: {
-      siglaTipo: { type: 'string', description: 'Sigla do tipo (PL, PEC, MPV, etc.)' },
-      numero: { type: 'number', description: 'Número da proposição' },
-      ano: { type: 'number', description: 'Ano da proposição' },
-      idDeputadoAutor: { type: 'number', description: 'ID do deputado autor da proposição. Use buscar_deputados para obter o ID.' },
-      siglaPartidoAutor: { type: 'string', description: 'Sigla do partido do autor' },
-      siglaUfAutor: { type: 'string', description: 'UF do autor' },
-      keywords: { type: 'string', description: 'Palavras-chave' },
-      dataInicio: { type: 'string', description: 'Data de início (YYYY-MM-DD)' },
-      dataFim: { type: 'string', description: 'Data de fim (YYYY-MM-DD)' },
-      dataInicioApresentacao: { type: 'string', description: 'Data inicial de apresentação' },
-      dataFimApresentacao: { type: 'string', description: 'Data final de apresentação' },
-      idSituacao: { type: 'number', description: 'ID da situação' },
-      siglaSituacao: { type: 'string', description: 'Sigla da situação' },
-      codTema: { type: 'number', description: 'Código do tema' },
-      tramitacaoSenado: { type: 'boolean', description: 'Em tramitação no Senado' },
-      pagina: { type: 'number', description: 'Número da página' },
-      itens: { type: 'number', description: 'Itens por página' },
-      ordem: { type: 'string', enum: ['ASC', 'DESC'], description: 'Ordem' },
-      ordenarPor: { type: 'string', enum: ['id', 'ano', 'dataApresentacao'], description: 'Ordenar por' }
+      siglaTipo: {
+        type: 'string',
+        description: 'Sigla do tipo de proposição',
+        examples: ['PL', 'PEC', 'MPV', 'PDL', 'PLP']
+      },
+      numero: {
+        type: 'number',
+        description: 'Número da proposição (ex: 1234)'
+      },
+      ano: {
+        type: 'number',
+        description: 'Ano da proposição (ex: 2024)'
+      },
+      idDeputadoAutor: {
+        type: 'number',
+        description: 'ID do deputado autor. Use buscar_deputados primeiro para obter o ID correto'
+      },
+      siglaPartidoAutor: {
+        type: 'string',
+        description: 'Sigla do partido do autor',
+        examples: ['PT', 'PL', 'PSDB', 'MDB']
+      },
+      siglaUfAutor: {
+        type: 'string',
+        description: 'UF do autor',
+        examples: ['SP', 'RJ', 'MG', 'BA']
+      },
+      keywords: {
+        type: 'string',
+        description: 'Palavras-chave para busca no texto. ATENÇÃO: Máximo 100 caracteres. Se combinado com outros filtros pode causar erro - use sozinho primeiro',
+        examples: ['educação', 'saúde pública', 'reforma tributária']
+      },
+      dataInicio: {
+        type: 'string',
+        description: 'Data de início para filtro de tramitação. Formato: YYYY-MM-DD',
+        examples: ['2024-01-01']
+      },
+      dataFim: {
+        type: 'string',
+        description: 'Data de fim para filtro de tramitação. Formato: YYYY-MM-DD',
+        examples: ['2024-12-31']
+      },
+      dataInicioApresentacao: {
+        type: 'string',
+        description: 'Data inicial de apresentação. Formato: YYYY-MM-DD',
+        examples: ['2024-01-01']
+      },
+      dataFimApresentacao: {
+        type: 'string',
+        description: 'Data final de apresentação. Formato: YYYY-MM-DD',
+        examples: ['2024-12-31']
+      },
+      idSituacao: {
+        type: 'number',
+        description: 'ID da situação. Use listar_situacoes_proposicao para ver opções'
+      },
+      siglaSituacao: {
+        type: 'string',
+        description: 'Sigla da situação da proposição'
+      },
+      codTema: {
+        type: 'number',
+        description: 'Código do tema. Use listar_temas_proposicao para ver opções'
+      },
+      tramitacaoSenado: {
+        type: 'boolean',
+        description: 'Se true, busca proposições em tramitação no Senado'
+      },
+      pagina: {
+        type: 'number',
+        description: 'Número da página (padrão: 1)',
+        default: 1
+      },
+      itens: {
+        type: 'number',
+        description: 'Itens por página. Mínimo: 1, Máximo: 100 (padrão: 25)',
+        default: 25,
+        minimum: 1,
+        maximum: 100
+      },
+      ordem: {
+        type: 'string',
+        enum: ['ASC', 'DESC'],
+        description: 'Ordem de classificação. CUIDADO: Pode causar erro em combinação com alguns filtros. Use apenas se necessário',
+        default: 'DESC'
+      },
+      ordenarPor: {
+        type: 'string',
+        enum: ['id', 'ano', 'dataApresentacao'],
+        description: 'Campo para ordenação. CUIDADO: Pode causar erro em alguns endpoints. Omita se não for essencial'
+      }
     }
   },
   handler: buscarProposicoes

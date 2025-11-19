@@ -1,10 +1,11 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { DataNormalizer } from '../../api/normalizers.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { createPaginacaoResposta, UFEnum, SexoEnum, OrdemEnum } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
+import { formatZodError } from '../../core/errors.js';
 
 const BuscarDeputadosSchema = z.object({
   nome: z.string().min(3).optional(),
@@ -27,7 +28,15 @@ export async function buscarDeputados(params: BuscarDeputadosParams) {
 
   try {
     // Validação
-    const validated = BuscarDeputadosSchema.parse(params);
+    let validated: BuscarDeputadosParams;
+    try {
+      validated = BuscarDeputadosSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw formatZodError(error);
+      }
+      throw error;
+    }
 
     // Cache check
     const cacheKey = createCacheKey(validated);
@@ -96,58 +105,69 @@ export async function buscarDeputados(params: BuscarDeputadosParams) {
 
 export const buscarDeputadosTool = {
   name: 'buscar_deputados',
-  description: 'Busca deputados por diversos critérios: nome, UF, partido, sexo, legislatura, etc.',
+  description: 'Busca deputados por diversos critérios. DICA: Use "nome" para busca por nome, ou combine "uf" + "partido" para filtrar por região e partido.',
   inputSchema: {
     type: 'object',
     properties: {
       nome: {
         type: 'string',
-        description: 'Nome do deputado (mínimo 3 caracteres)'
+        description: 'Nome do deputado. Mínimo 3 caracteres. Busca parcial (ex: "Maria" encontra "Maria do Rosário")',
+        examples: ['Lula', 'Maria', 'João Paulo']
       },
       uf: {
         type: 'string',
-        description: 'Sigla da UF (ex: SP, RJ, MG)',
+        description: 'Sigla da UF do deputado',
         enum: ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
                'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
-               'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
+               'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'],
+        examples: ['SP', 'RJ', 'MG']
       },
       partido: {
         type: 'string',
-        description: 'Sigla do partido (ex: PT, PSDB, MDB)'
+        description: 'Sigla do partido político',
+        examples: ['PT', 'PL', 'PSDB', 'MDB', 'PP', 'UNIÃO']
       },
       sexo: {
         type: 'string',
-        description: 'Sexo do deputado',
+        description: 'Sexo do deputado: M (masculino) ou F (feminino)',
         enum: ['M', 'F']
       },
       idLegislatura: {
         type: 'number',
-        description: 'ID da legislatura (1-57)'
+        description: 'ID da legislatura. Atual: 57 (2023-2027). Use listar_legislaturas para ver todas',
+        examples: [57, 56, 55]
       },
       dataInicio: {
         type: 'string',
-        description: 'Data de início do mandato (formato: YYYY-MM-DD)'
+        description: 'Data de início do mandato. Formato: YYYY-MM-DD',
+        examples: ['2023-02-01']
       },
       dataFim: {
         type: 'string',
-        description: 'Data de fim do mandato (formato: YYYY-MM-DD)'
+        description: 'Data de fim do mandato. Formato: YYYY-MM-DD',
+        examples: ['2027-01-31']
       },
       pagina: {
         type: 'number',
-        description: 'Número da página (padrão: 1)'
+        description: 'Número da página (padrão: 1)',
+        default: 1
       },
       itens: {
         type: 'number',
-        description: 'Itens por página (1-100, padrão: 25)'
+        description: 'Itens por página. Mínimo: 1, Máximo: 100 (padrão: 25)',
+        default: 25,
+        minimum: 1,
+        maximum: 100
       },
       ordem: {
         type: 'string',
-        description: 'Ordem de ordenação',
-        enum: ['ASC', 'DESC']
+        description: 'Ordem de classificação',
+        enum: ['ASC', 'DESC'],
+        default: 'ASC'
       },
       ordenarPor: {
         type: 'string',
-        description: 'Campo para ordenação',
+        description: 'Campo para ordenação. CUIDADO: Pode causar erro em combinação com alguns filtros',
         enum: ['id', 'idLegislatura', 'nome']
       }
     }

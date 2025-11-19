@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import pRetry from 'p-retry';
 import { CONFIG } from '../config.js';
-import { CamaraAPIError, isRetryableError } from '../core/errors.js';
+import { CamaraAPIError, isRetryableError, createInformativeAPIError } from '../core/errors.js';
 import { logger, logAPIRequest, logError } from '../core/logging.js';
 import { circuitBreaker } from '../core/circuit-breaker.js';
 import { rateLimiter } from '../core/rate-limiter.js';
@@ -104,6 +104,17 @@ export class CamaraAPIClient {
       const duration = Date.now() - startTime;
       metricsCollector.incrementError(error instanceof Error ? error.name : 'UnknownError');
       logError(error as Error, { endpoint, params, duration });
+
+      // Enriquecer erros de API com contexto informativo
+      if (error instanceof CamaraAPIError && error.statusCode && params) {
+        throw createInformativeAPIError(
+          error.statusCode,
+          endpoint,
+          params,
+          error.details
+        );
+      }
+
       throw error;
     }
   }

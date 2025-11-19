@@ -1,10 +1,11 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { DataNormalizer } from '../../api/normalizers.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { createPaginacaoResposta, IdSchema, AnoSchema, MesSchema, OrdemEnum } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
+import { formatZodError } from '../../core/errors.js';
 
 const DespesasDeputadoSchema = z.object({
   id: IdSchema,
@@ -25,7 +26,15 @@ export async function despesasDeputado(params: DespesasDeputadoParams) {
 
   try {
     // Validação
-    const validated = DespesasDeputadoSchema.parse(params);
+    let validated: DespesasDeputadoParams;
+    try {
+      validated = DespesasDeputadoSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw formatZodError(error);
+      }
+      throw error;
+    }
 
     // Cache check
     const cacheKey = createCacheKey(validated);
@@ -97,46 +106,56 @@ export async function despesasDeputado(params: DespesasDeputadoParams) {
 
 export const despesasDeputadoTool = {
   name: 'despesas_deputado',
-  description: 'Lista as despesas de um deputado (cota parlamentar)',
+  description: 'Lista as despesas de um deputado da cota parlamentar. Use buscar_deputados primeiro para obter o ID do deputado.',
   inputSchema: {
     type: 'object',
     properties: {
       id: {
         type: 'number',
-        description: 'ID do deputado'
+        description: 'ID do deputado. OBRIGATÓRIO. Use buscar_deputados para obter o ID'
       },
       ano: {
         type: 'number',
-        description: 'Ano das despesas (2008 até ano atual)'
+        description: 'Ano das despesas (2008 até ano atual)',
+        examples: [2024, 2023, 2022]
       },
       mes: {
         type: 'number',
-        description: 'Mês das despesas (1-12)'
+        description: 'Mês das despesas (1-12). Use junto com ano para filtrar um mês específico',
+        examples: [1, 6, 12],
+        minimum: 1,
+        maximum: 12
       },
       tipoDespesa: {
         type: 'string',
-        description: 'Tipo de despesa'
+        description: 'Tipo de despesa. Ex: "PASSAGEM AÉREA", "COMBUSTÍVEIS", "DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR"',
+        examples: ['PASSAGEM AÉREA', 'COMBUSTÍVEIS', 'ALIMENTAÇÃO']
       },
       fornecedor: {
         type: 'string',
-        description: 'Nome do fornecedor'
+        description: 'Nome do fornecedor (busca parcial)'
       },
       pagina: {
         type: 'number',
-        description: 'Número da página (padrão: 1)'
+        description: 'Número da página (padrão: 1)',
+        default: 1
       },
       itens: {
         type: 'number',
-        description: 'Itens por página (1-100, padrão: 25)'
+        description: 'Itens por página. Mínimo: 1, Máximo: 100 (padrão: 25)',
+        default: 25,
+        minimum: 1,
+        maximum: 100
       },
       ordem: {
         type: 'string',
-        description: 'Ordem de ordenação',
-        enum: ['ASC', 'DESC']
+        description: 'Ordem de classificação',
+        enum: ['ASC', 'DESC'],
+        default: 'DESC'
       },
       ordenarPor: {
         type: 'string',
-        description: 'Campo para ordenação',
+        description: 'Campo para ordenação. Use "valorLiquido" para ver maiores/menores gastos',
         enum: ['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']
       }
     },

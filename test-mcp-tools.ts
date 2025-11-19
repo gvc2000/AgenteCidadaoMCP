@@ -270,6 +270,19 @@ async function main() {
   // 2. PROPOSICOES
   console.log('\n[PROPOSICOES]');
 
+  // Buscar proposicoes validas para usar nos testes
+  let propIds: number[] = [];
+  try {
+    const props = await buscarProposicoes({ siglaTipo: 'PL', ano: 2024, itens: 5 });
+    if (props.proposicoes && props.proposicoes.length >= 4) {
+      propIds = props.proposicoes.map((p: any) => p.id);
+    }
+  } catch (e) {
+    console.log('  Usando IDs de proposicao padrao');
+    propIds = [2120019, 2120020, 2120021, 2120022];
+  }
+  await sleep(DELAY_BETWEEN_TESTS);
+
   console.log('\nbuscar_proposicoes:');
   await runTest('buscar_proposicoes', 'PLs de 2024', () => buscarProposicoes({ siglaTipo: 'PL', ano: 2024, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
@@ -283,73 +296,73 @@ async function main() {
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ndetalhar_proposicao:');
-  await runTest('detalhar_proposicao', 'PL conhecida', () => detalharProposicao({ id: 2120019 }));
+  await runTest('detalhar_proposicao', 'Proposicao 1', () => detalharProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_proposicao', 'Outra PL', () => detalharProposicao({ id: 2120020 }));
+  await runTest('detalhar_proposicao', 'Proposicao 2', () => detalharProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_proposicao', 'PL 2023', () => detalharProposicao({ id: 2044755 }));
+  await runTest('detalhar_proposicao', 'Proposicao 3', () => detalharProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_proposicao', 'Proposicao antiga', () => detalharProposicao({ id: 1000000 }));
+  await runTest('detalhar_proposicao', 'Proposicao 4', () => detalharProposicao({ id: propIds[3] || 2120022 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_proposicao', 'ID inexistente', () => detalharProposicao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nautores_proposicao:');
-  await runTest('autores_proposicao', 'Autores PL', () => autoresProposicao({ id: 2120019 }));
+  await runTest('autores_proposicao', 'Autores proposicao 1', () => autoresProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('autores_proposicao', 'Autores outra PL', () => autoresProposicao({ id: 2120020 }));
+  await runTest('autores_proposicao', 'Autores proposicao 2', () => autoresProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('autores_proposicao', 'Autores PL 2023', () => autoresProposicao({ id: 2044755 }));
+  await runTest('autores_proposicao', 'Autores proposicao 3', () => autoresProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('autores_proposicao', 'Proposicao antiga', () => autoresProposicao({ id: 1000000 }));
+  await runTest('autores_proposicao', 'Autores proposicao 4', () => autoresProposicao({ id: propIds[3] || 2120022 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('autores_proposicao', 'ID inexistente', () => autoresProposicao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ntramitacoes_proposicao:');
-  await runTest('tramitacoes_proposicao', 'Tramitacoes PL', () => tramitacoesProposicao({ id: 2120019 }));
+  await runTest('tramitacoes_proposicao', 'Tramitacoes proposicao 1', () => tramitacoesProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('tramitacoes_proposicao', 'Tramitacoes outra PL', () => tramitacoesProposicao({ id: 2120020 }));
+  await runTest('tramitacoes_proposicao', 'Tramitacoes proposicao 2', () => tramitacoesProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('tramitacoes_proposicao', 'Tramitacoes PL 2023', () => tramitacoesProposicao({ id: 2044755 }));
+  await runTest('tramitacoes_proposicao', 'Tramitacoes proposicao 3', () => tramitacoesProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('tramitacoes_proposicao', 'Ordenado DESC', () => tramitacoesProposicao({ id: 2120019, ordem: 'DESC' }));
+  await runTest('tramitacoes_proposicao', 'Ordenado DESC', () => tramitacoesProposicao({ id: propIds[0] || 2120019, ordem: 'DESC' }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('tramitacoes_proposicao', 'ID inexistente', () => tramitacoesProposicao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nvotacoes_proposicao:');
-  await runTest('votacoes_proposicao', 'Votacoes PL', () => votacoesProposicao({ id: 2120019 }));
+  await runTest('votacoes_proposicao', 'Votacoes proposicao 1', () => votacoesProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_proposicao', 'Votacoes outra PL', () => votacoesProposicao({ id: 2120020 }));
+  await runTest('votacoes_proposicao', 'Votacoes proposicao 2', () => votacoesProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_proposicao', 'Votacoes PL 2023', () => votacoesProposicao({ id: 2044755 }));
+  await runTest('votacoes_proposicao', 'Votacoes proposicao 3', () => votacoesProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_proposicao', 'Ordenado DESC', () => votacoesProposicao({ id: 2120019, ordem: 'DESC' }));
+  await runTest('votacoes_proposicao', 'Ordenado DESC', () => votacoesProposicao({ id: propIds[0] || 2120019, ordem: 'DESC' }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('votacoes_proposicao', 'ID inexistente', () => votacoesProposicao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nrelacionadas_proposicao:');
-  await runTest('relacionadas_proposicao', 'Relacionadas PL', () => relacionadasProposicao({ id: 2120019 }));
+  await runTest('relacionadas_proposicao', 'Relacionadas proposicao 1', () => relacionadasProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('relacionadas_proposicao', 'Relacionadas outra PL', () => relacionadasProposicao({ id: 2120020 }));
+  await runTest('relacionadas_proposicao', 'Relacionadas proposicao 2', () => relacionadasProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('relacionadas_proposicao', 'Relacionadas PL 2023', () => relacionadasProposicao({ id: 2044755 }));
+  await runTest('relacionadas_proposicao', 'Relacionadas proposicao 3', () => relacionadasProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('relacionadas_proposicao', 'Proposicao antiga', () => relacionadasProposicao({ id: 1000000 }));
+  await runTest('relacionadas_proposicao', 'Relacionadas proposicao 4', () => relacionadasProposicao({ id: propIds[3] || 2120022 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('relacionadas_proposicao', 'ID inexistente', () => relacionadasProposicao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ntemas_proposicao:');
-  await runTest('temas_proposicao', 'Temas PL', () => temasProposicao({ id: 2120019 }));
+  await runTest('temas_proposicao', 'Temas proposicao 1', () => temasProposicao({ id: propIds[0] || 2120019 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('temas_proposicao', 'Temas outra PL', () => temasProposicao({ id: 2120020 }));
+  await runTest('temas_proposicao', 'Temas proposicao 2', () => temasProposicao({ id: propIds[1] || 2120020 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('temas_proposicao', 'Temas PL 2023', () => temasProposicao({ id: 2044755 }));
+  await runTest('temas_proposicao', 'Temas proposicao 3', () => temasProposicao({ id: propIds[2] || 2120021 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('temas_proposicao', 'Proposicao antiga', () => temasProposicao({ id: 1000000 }));
+  await runTest('temas_proposicao', 'Temas proposicao 4', () => temasProposicao({ id: propIds[3] || 2120022 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('temas_proposicao', 'ID inexistente', () => temasProposicao({ id: 999999999 }));
 
@@ -382,49 +395,50 @@ async function main() {
   await runTest('ultimas_votacoes', 'Ordenado ASC', () => ultimasVotacoes({ itens: 5, ordem: 'ASC' }));
   await sleep(DELAY_BETWEEN_TESTS);
 
-  // Buscar uma votacao para usar nos proximos testes
-  let votacaoId = '2322686-290';  // ID de exemplo
+  // Buscar votacoes validas para usar nos testes
+  let votacaoIds: string[] = [];
   try {
-    const votacoes = await ultimasVotacoes({ itens: 1 });
-    if (votacoes.votacoes && votacoes.votacoes.length > 0) {
-      votacaoId = votacoes.votacoes[0].id;
+    const votacoes = await ultimasVotacoes({ itens: 5 });
+    if (votacoes.votacoes && votacoes.votacoes.length >= 4) {
+      votacaoIds = votacoes.votacoes.map((v: any) => v.id);
     }
   } catch (e) {
-    console.log('  Usando ID de votacao padrao');
+    console.log('  Usando IDs de votacao padrao');
   }
+  const votacaoId = votacaoIds[0] || '2322686-290';
 
   console.log('\ndetalhar_votacao:');
-  await runTest('detalhar_votacao', 'Votacao recente', () => detalharVotacao({ id: votacaoId }));
+  await runTest('detalhar_votacao', 'Votacao 1', () => detalharVotacao({ id: votacaoIds[0] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_votacao', 'Votacao exemplo 1', () => detalharVotacao({ id: '2322686-290' }));
+  await runTest('detalhar_votacao', 'Votacao 2', () => detalharVotacao({ id: votacaoIds[1] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_votacao', 'Votacao exemplo 2', () => detalharVotacao({ id: '2322686-291' }));
+  await runTest('detalhar_votacao', 'Votacao 3', () => detalharVotacao({ id: votacaoIds[2] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_votacao', 'Votacao exemplo 3', () => detalharVotacao({ id: '2322686-292' }));
+  await runTest('detalhar_votacao', 'Votacao 4', () => detalharVotacao({ id: votacaoIds[3] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_votacao', 'ID inexistente', () => detalharVotacao({ id: 'inexistente-999' }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nvotos_votacao:');
-  await runTest('votos_votacao', 'Votos recente', () => votosVotacao({ id: votacaoId }));
+  await runTest('votos_votacao', 'Votos votacao 1', () => votosVotacao({ id: votacaoIds[0] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votos_votacao', 'Votos exemplo 1', () => votosVotacao({ id: '2322686-290' }));
+  await runTest('votos_votacao', 'Votos votacao 2', () => votosVotacao({ id: votacaoIds[1] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votos_votacao', 'Votos exemplo 2', () => votosVotacao({ id: '2322686-291' }));
+  await runTest('votos_votacao', 'Votos votacao 3', () => votosVotacao({ id: votacaoIds[2] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votos_votacao', 'Votos exemplo 3', () => votosVotacao({ id: '2322686-292' }));
+  await runTest('votos_votacao', 'Votos votacao 4', () => votosVotacao({ id: votacaoIds[3] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('votos_votacao', 'ID inexistente', () => votosVotacao({ id: 'inexistente-999' }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\norientacoes_votacao:');
-  await runTest('orientacoes_votacao', 'Orientacoes recente', () => orientacoesVotacao({ id: votacaoId }));
+  await runTest('orientacoes_votacao', 'Orientacoes votacao 1', () => orientacoesVotacao({ id: votacaoIds[0] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orientacoes_votacao', 'Orientacoes exemplo 1', () => orientacoesVotacao({ id: '2322686-290' }));
+  await runTest('orientacoes_votacao', 'Orientacoes votacao 2', () => orientacoesVotacao({ id: votacaoIds[1] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orientacoes_votacao', 'Orientacoes exemplo 2', () => orientacoesVotacao({ id: '2322686-291' }));
+  await runTest('orientacoes_votacao', 'Orientacoes votacao 3', () => orientacoesVotacao({ id: votacaoIds[2] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orientacoes_votacao', 'Orientacoes exemplo 3', () => orientacoesVotacao({ id: '2322686-292' }));
+  await runTest('orientacoes_votacao', 'Orientacoes votacao 4', () => orientacoesVotacao({ id: votacaoIds[3] || votacaoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('orientacoes_votacao', 'ID inexistente', () => orientacoesVotacao({ id: 'inexistente-999' }));
 
@@ -445,73 +459,74 @@ async function main() {
   await runTest('buscar_eventos', 'Eventos pagina 2', () => buscarEventos({ dataInicio: '2024-01-01', dataFim: '2024-12-31', pagina: 2, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
-  // Buscar um evento para usar nos proximos testes
-  let eventoId = 70000;  // ID de exemplo
+  // Buscar eventos validos para usar nos testes
+  let eventoIds: number[] = [];
   try {
-    const eventos = await buscarEventos({ dataInicio: '2024-11-01', dataFim: '2024-11-30', itens: 1 });
-    if (eventos.eventos && eventos.eventos.length > 0) {
-      eventoId = eventos.eventos[0].id;
+    const eventos = await buscarEventos({ dataInicio: '2024-11-01', dataFim: '2024-11-30', itens: 5 });
+    if (eventos.eventos && eventos.eventos.length >= 4) {
+      eventoIds = eventos.eventos.map((e: any) => e.id);
     }
   } catch (e) {
-    console.log('  Usando ID de evento padrao');
+    console.log('  Usando IDs de evento padrao');
   }
+  const eventoId = eventoIds[0] || 70000;
 
   console.log('\ndetalhar_evento:');
-  await runTest('detalhar_evento', 'Evento recente', () => detalharEvento({ id: eventoId }));
+  await runTest('detalhar_evento', 'Evento 1', () => detalharEvento({ id: eventoIds[0] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_evento', 'Evento exemplo 1', () => detalharEvento({ id: 70000 }));
+  await runTest('detalhar_evento', 'Evento 2', () => detalharEvento({ id: eventoIds[1] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_evento', 'Evento exemplo 2', () => detalharEvento({ id: 70001 }));
+  await runTest('detalhar_evento', 'Evento 3', () => detalharEvento({ id: eventoIds[2] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_evento', 'Evento exemplo 3', () => detalharEvento({ id: 70002 }));
+  await runTest('detalhar_evento', 'Evento 4', () => detalharEvento({ id: eventoIds[3] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_evento', 'ID inexistente', () => detalharEvento({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\ndeputados_evento:');
-  await runTest('deputados_evento', 'Deputados recente', () => deputadosEvento({ id: eventoId }));
+  await runTest('deputados_evento', 'Deputados evento 1', () => deputadosEvento({ id: eventoIds[0] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('deputados_evento', 'Deputados exemplo 1', () => deputadosEvento({ id: 70000 }));
+  await runTest('deputados_evento', 'Deputados evento 2', () => deputadosEvento({ id: eventoIds[1] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('deputados_evento', 'Deputados exemplo 2', () => deputadosEvento({ id: 70001 }));
+  await runTest('deputados_evento', 'Deputados evento 3', () => deputadosEvento({ id: eventoIds[2] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('deputados_evento', 'Deputados exemplo 3', () => deputadosEvento({ id: 70002 }));
+  await runTest('deputados_evento', 'Deputados evento 4', () => deputadosEvento({ id: eventoIds[3] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('deputados_evento', 'ID inexistente', () => deputadosEvento({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\npauta_evento:');
-  await runTest('pauta_evento', 'Pauta recente', () => pautaEvento({ id: eventoId }));
+  await runTest('pauta_evento', 'Pauta evento 1', () => pautaEvento({ id: eventoIds[0] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('pauta_evento', 'Pauta exemplo 1', () => pautaEvento({ id: 70000 }));
+  await runTest('pauta_evento', 'Pauta evento 2', () => pautaEvento({ id: eventoIds[1] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('pauta_evento', 'Pauta exemplo 2', () => pautaEvento({ id: 70001 }));
+  await runTest('pauta_evento', 'Pauta evento 3', () => pautaEvento({ id: eventoIds[2] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('pauta_evento', 'Pauta exemplo 3', () => pautaEvento({ id: 70002 }));
+  await runTest('pauta_evento', 'Pauta evento 4', () => pautaEvento({ id: eventoIds[3] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('pauta_evento', 'ID inexistente', () => pautaEvento({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nvotacoes_evento:');
-  await runTest('votacoes_evento', 'Votacoes recente', () => votacoesEvento({ id: eventoId }));
+  await runTest('votacoes_evento', 'Votacoes evento 1', () => votacoesEvento({ id: eventoIds[0] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_evento', 'Votacoes exemplo 1', () => votacoesEvento({ id: 70000 }));
+  await runTest('votacoes_evento', 'Votacoes evento 2', () => votacoesEvento({ id: eventoIds[1] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_evento', 'Votacoes exemplo 2', () => votacoesEvento({ id: 70001 }));
+  await runTest('votacoes_evento', 'Votacoes evento 3', () => votacoesEvento({ id: eventoIds[2] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_evento', 'Votacoes exemplo 3', () => votacoesEvento({ id: 70002 }));
+  await runTest('votacoes_evento', 'Votacoes evento 4', () => votacoesEvento({ id: eventoIds[3] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('votacoes_evento', 'ID inexistente', () => votacoesEvento({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\norgaos_evento:');
-  await runTest('orgaos_evento', 'Orgaos recente', () => orgaosEvento({ id: eventoId }));
+  await runTest('orgaos_evento', 'Orgaos evento 1', () => orgaosEvento({ id: eventoIds[0] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orgaos_evento', 'Orgaos exemplo 1', () => orgaosEvento({ id: 70000 }));
+  await runTest('orgaos_evento', 'Orgaos evento 2', () => orgaosEvento({ id: eventoIds[1] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orgaos_evento', 'Orgaos exemplo 2', () => orgaosEvento({ id: 70001 }));
+  await runTest('orgaos_evento', 'Orgaos evento 3', () => orgaosEvento({ id: eventoIds[2] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('orgaos_evento', 'Orgaos exemplo 3', () => orgaosEvento({ id: 70002 }));
+  await runTest('orgaos_evento', 'Orgaos evento 4', () => orgaosEvento({ id: eventoIds[3] || eventoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('orgaos_evento', 'ID inexistente', () => orgaosEvento({ id: 999999999 }));
 
@@ -532,50 +547,62 @@ async function main() {
   await runTest('buscar_orgaos', 'Pagina 2', () => buscarOrgaos({ pagina: 2, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
+  // Buscar orgaos validos para usar nos testes
+  let orgaoIds: number[] = [];
+  try {
+    const orgaos = await buscarOrgaos({ itens: 5 });
+    if (orgaos.orgaos && orgaos.orgaos.length >= 4) {
+      orgaoIds = orgaos.orgaos.map((o: any) => o.id);
+    }
+  } catch (e) {
+    console.log('  Usando IDs de orgao padrao');
+    orgaoIds = [2003, 180, 2000, 2001];
+  }
+
   console.log('\ndetalhar_orgao:');
-  await runTest('detalhar_orgao', 'CCJC', () => detalharOrgao({ id: 2003 }));
+  await runTest('detalhar_orgao', 'Orgao 1', () => detalharOrgao({ id: orgaoIds[0] || 2003 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_orgao', 'Plenario', () => detalharOrgao({ id: 180 }));
+  await runTest('detalhar_orgao', 'Orgao 2', () => detalharOrgao({ id: orgaoIds[1] || 180 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_orgao', 'Mesa Diretora', () => detalharOrgao({ id: 1 }));
+  await runTest('detalhar_orgao', 'Orgao 3', () => detalharOrgao({ id: orgaoIds[2] || 2000 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_orgao', 'CFT', () => detalharOrgao({ id: 2005 }));
+  await runTest('detalhar_orgao', 'Orgao 4', () => detalharOrgao({ id: orgaoIds[3] || 2001 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_orgao', 'ID inexistente', () => detalharOrgao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nmembros_orgao:');
-  await runTest('membros_orgao', 'Membros CCJC', () => membrosOrgao({ id: 2003 }));
+  await runTest('membros_orgao', 'Membros orgao 1', () => membrosOrgao({ id: orgaoIds[0] || 2003 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_orgao', 'Membros Plenario', () => membrosOrgao({ id: 180 }));
+  await runTest('membros_orgao', 'Membros orgao 2', () => membrosOrgao({ id: orgaoIds[1] || 180 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_orgao', 'Membros Mesa', () => membrosOrgao({ id: 1 }));
+  await runTest('membros_orgao', 'Membros orgao 3', () => membrosOrgao({ id: orgaoIds[2] || 2000 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_orgao', 'Membros CFT', () => membrosOrgao({ id: 2005 }));
+  await runTest('membros_orgao', 'Membros orgao 4', () => membrosOrgao({ id: orgaoIds[3] || 2001 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('membros_orgao', 'ID inexistente', () => membrosOrgao({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\neventos_orgao:');
-  await runTest('eventos_orgao', 'Eventos CCJC', () => eventosOrgao({ id: 2003, itens: 5 }));
+  await runTest('eventos_orgao', 'Eventos orgao 1', () => eventosOrgao({ id: orgaoIds[0] || 2003, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('eventos_orgao', 'Eventos Plenario', () => eventosOrgao({ id: 180, itens: 5 }));
+  await runTest('eventos_orgao', 'Eventos orgao 2', () => eventosOrgao({ id: orgaoIds[1] || 180, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('eventos_orgao', 'Eventos Mesa', () => eventosOrgao({ id: 1, itens: 5 }));
+  await runTest('eventos_orgao', 'Eventos orgao 3', () => eventosOrgao({ id: orgaoIds[2] || 2000, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('eventos_orgao', 'Eventos CFT', () => eventosOrgao({ id: 2005, itens: 5 }));
+  await runTest('eventos_orgao', 'Eventos orgao 4', () => eventosOrgao({ id: orgaoIds[3] || 2001, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('eventos_orgao', 'ID inexistente', () => eventosOrgao({ id: 999999999, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nvotacoes_orgao:');
-  await runTest('votacoes_orgao', 'Votacoes CCJC', () => votacoesOrgao({ id: 2003, itens: 5 }));
+  await runTest('votacoes_orgao', 'Votacoes orgao 1', () => votacoesOrgao({ id: orgaoIds[0] || 2003, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_orgao', 'Votacoes Plenario', () => votacoesOrgao({ id: 180, itens: 5 }));
+  await runTest('votacoes_orgao', 'Votacoes orgao 2', () => votacoesOrgao({ id: orgaoIds[1] || 180, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_orgao', 'Votacoes Mesa', () => votacoesOrgao({ id: 1, itens: 5 }));
+  await runTest('votacoes_orgao', 'Votacoes orgao 3', () => votacoesOrgao({ id: orgaoIds[2] || 2000, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('votacoes_orgao', 'Votacoes CFT', () => votacoesOrgao({ id: 2005, itens: 5 }));
+  await runTest('votacoes_orgao', 'Votacoes orgao 4', () => votacoesOrgao({ id: orgaoIds[3] || 2001, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('votacoes_orgao', 'ID inexistente', () => votacoesOrgao({ id: 999999999, itens: 5 }));
 
@@ -648,37 +675,38 @@ async function main() {
   await runTest('buscar_frentes', 'Pagina 2', () => buscarFrentes({ pagina: 2, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
-  // Buscar uma frente para usar nos proximos testes
-  let frenteId = 54254;  // ID de exemplo
+  // Buscar frentes validas para usar nos testes
+  let frenteIds: number[] = [];
   try {
-    const frentes = await buscarFrentes({ itens: 1 });
-    if (frentes.frentes && frentes.frentes.length > 0) {
-      frenteId = frentes.frentes[0].id;
+    const frentes = await buscarFrentes({ itens: 5 });
+    if (frentes.frentes && frentes.frentes.length >= 4) {
+      frenteIds = frentes.frentes.map((f: any) => f.id);
     }
   } catch (e) {
-    console.log('  Usando ID de frente padrao');
+    console.log('  Usando IDs de frente padrao');
   }
+  const frenteId = frenteIds[0] || 54254;
 
   console.log('\ndetalhar_frente:');
-  await runTest('detalhar_frente', 'Frente recente', () => detalharFrente({ id: frenteId }));
+  await runTest('detalhar_frente', 'Frente 1', () => detalharFrente({ id: frenteIds[0] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_frente', 'Frente exemplo 1', () => detalharFrente({ id: 54254 }));
+  await runTest('detalhar_frente', 'Frente 2', () => detalharFrente({ id: frenteIds[1] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_frente', 'Frente exemplo 2', () => detalharFrente({ id: 54255 }));
+  await runTest('detalhar_frente', 'Frente 3', () => detalharFrente({ id: frenteIds[2] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_frente', 'Frente exemplo 3', () => detalharFrente({ id: 54256 }));
+  await runTest('detalhar_frente', 'Frente 4', () => detalharFrente({ id: frenteIds[3] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_frente', 'ID inexistente', () => detalharFrente({ id: 999999999 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
   console.log('\nmembros_frente:');
-  await runTest('membros_frente', 'Membros recente', () => membrosFrente({ id: frenteId }));
+  await runTest('membros_frente', 'Membros frente 1', () => membrosFrente({ id: frenteIds[0] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_frente', 'Membros exemplo 1', () => membrosFrente({ id: 54254 }));
+  await runTest('membros_frente', 'Membros frente 2', () => membrosFrente({ id: frenteIds[1] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_frente', 'Membros exemplo 2', () => membrosFrente({ id: 54255 }));
+  await runTest('membros_frente', 'Membros frente 3', () => membrosFrente({ id: frenteIds[2] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('membros_frente', 'Membros exemplo 3', () => membrosFrente({ id: 54256 }));
+  await runTest('membros_frente', 'Membros frente 4', () => membrosFrente({ id: frenteIds[3] || frenteId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('membros_frente', 'ID inexistente', () => membrosFrente({ id: 999999999 }));
 
@@ -699,25 +727,26 @@ async function main() {
   await runTest('buscar_blocos', 'Pagina 2', () => buscarBlocos({ pagina: 2, itens: 5 }));
   await sleep(DELAY_BETWEEN_TESTS);
 
-  // Buscar um bloco para usar nos proximos testes
-  let blocoId = 1;  // ID de exemplo
+  // Buscar blocos validos para usar nos testes
+  let blocoIds: (string | number)[] = [];
   try {
-    const blocos = await buscarBlocos({ itens: 1 });
-    if (blocos.blocos && blocos.blocos.length > 0) {
-      blocoId = blocos.blocos[0].id;
+    const blocos = await buscarBlocos({ itens: 5 });
+    if (blocos.blocos && blocos.blocos.length >= 4) {
+      blocoIds = blocos.blocos.map((b: any) => b.id);
     }
   } catch (e) {
-    console.log('  Usando ID de bloco padrao');
+    console.log('  Usando IDs de bloco padrao');
   }
+  const blocoId = blocoIds[0] || 1;
 
   console.log('\ndetalhar_bloco:');
-  await runTest('detalhar_bloco', 'Bloco recente', () => detalharBloco({ id: blocoId }));
+  await runTest('detalhar_bloco', 'Bloco 1', () => detalharBloco({ id: blocoIds[0] || blocoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_bloco', 'Bloco exemplo 1', () => detalharBloco({ id: 1 }));
+  await runTest('detalhar_bloco', 'Bloco 2', () => detalharBloco({ id: blocoIds[1] || blocoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_bloco', 'Bloco exemplo 2', () => detalharBloco({ id: 2 }));
+  await runTest('detalhar_bloco', 'Bloco 3', () => detalharBloco({ id: blocoIds[2] || blocoId }));
   await sleep(DELAY_BETWEEN_TESTS);
-  await runTest('detalhar_bloco', 'Bloco exemplo 3', () => detalharBloco({ id: 3 }));
+  await runTest('detalhar_bloco', 'Bloco 4', () => detalharBloco({ id: blocoIds[3] || blocoId }));
   await sleep(DELAY_BETWEEN_TESTS);
   await runTest('detalhar_bloco', 'ID inexistente', () => detalharBloco({ id: 999999999 }));
 

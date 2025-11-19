@@ -31,7 +31,7 @@ export async function ufs(params: UFsParams = {}) {
 
 export const ufsTool = {
   name: 'ufs',
-  description: 'Lista as Unidades Federativas (estados) do Brasil',
+  description: 'Lista todas as Unidades Federativas (estados) do Brasil com siglas e nomes completos. Use para validar siglas de UF ou obter a lista completa de estados ao filtrar deputados por região em buscar_deputados.',
   inputSchema: { type: 'object', properties: {} },
   handler: ufs
 };

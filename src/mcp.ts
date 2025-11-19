@@ -3,7 +3,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
+
+import { prompts, getPromptContent } from './prompts/index.js';
 
 import { logger } from './core/logging.js';
 import { metricsCollector } from './core/metrics.js';
@@ -48,6 +52,7 @@ export class CamaraMCPServer {
       {
         capabilities: {
           tools: {},
+          prompts: {},
         },
       }
     );
@@ -67,6 +72,39 @@ export class CamaraMCPServer {
           description: tool.description,
           inputSchema: tool.inputSchema
         }))
+      };
+    });
+
+    // List available prompts
+    this.server.setRequestHandler(ListPromptsRequestSchema, async () => {
+      logger.info('Listing available prompts');
+
+      return {
+        prompts: prompts.map(prompt => ({
+          name: prompt.name,
+          description: prompt.description,
+          arguments: prompt.arguments
+        }))
+      };
+    });
+
+    // Get prompt content
+    this.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      logger.info({ prompt: name, args }, `Prompt requested: ${name}`);
+
+      const prompt = prompts.find(p => p.name === name);
+
+      if (!prompt) {
+        throw new Error(`Prompt not found: ${name}`);
+      }
+
+      const messages = getPromptContent(name, args || {});
+
+      return {
+        description: prompt.description,
+        messages
       };
     });
 

@@ -83,8 +83,8 @@ export class CamaraAPIClient {
               },
               shouldRetry: (error) => isRetryableError(error),
               minTimeout: CONFIG.retry.delay,
-              maxTimeout: CONFIG.retry.delay * 4,
-              factor: 2,
+              maxTimeout: CONFIG.retry.delay * 2,  // Reduzido de 4x para 2x
+              factor: 1.5,  // Reduzido de 2 para 1.5
               randomize: true
             }
           );

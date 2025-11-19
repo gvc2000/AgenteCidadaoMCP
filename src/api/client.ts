@@ -2,6 +2,7 @@ import axios, { AxiosInstance } from 'axios';
 import pRetry from 'p-retry';
 import { CONFIG } from '../config.js';
 import { CamaraAPIError, isRetryableError, createInformativeAPIError } from '../core/errors.js';
+import { simplifyParams } from '../core/validation-utils.js';
 import { logger, logAPIRequest, logError } from '../core/logging.js';
 import { circuitBreaker } from '../core/circuit-breaker.js';
 import { rateLimiter } from '../core/rate-limiter.js';
@@ -104,6 +105,36 @@ export class CamaraAPIClient {
       const duration = Date.now() - startTime;
       metricsCollector.incrementError(error instanceof Error ? error.name : 'UnknownError');
       logError(error as Error, { endpoint, params, duration });
+
+      // Retry inteligente para erro 400
+      if (error instanceof CamaraAPIError && error.statusCode === 400 && params) {
+        const { params: simplified, removed } = simplifyParams(endpoint, params);
+
+        if (removed.length > 0) {
+          logger.info({
+            type: 'smart_retry',
+            endpoint,
+            removedParams: removed
+          }, `Tentando novamente sem: ${removed.join(', ')}`);
+
+          try {
+            const retryResult = await this.get<T>(endpoint, simplified);
+            // Adicionar aviso sobre parâmetros removidos
+            return {
+              ...retryResult,
+              _warnings: [`Parâmetros removidos automaticamente para evitar erro: ${removed.join(', ')}`]
+            } as T;
+          } catch (retryError) {
+            // Se falhar novamente, lançar erro informativo original
+            throw createInformativeAPIError(
+              error.statusCode,
+              endpoint,
+              params,
+              error.details
+            );
+          }
+        }
+      }
 
       // Enriquecer erros de API com contexto informativo
       if (error instanceof CamaraAPIError && error.statusCode && params) {

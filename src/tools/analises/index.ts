@@ -7,6 +7,7 @@ export { comparativoVotacoesBancadas, comparativoVotacoesTool } from './comparat
 export { timelineTramitacao, timelineTramitacaoTool } from './timeline-tramitacao.js';
 export { exportarDados, exportarDadosTool } from './exportar-dados.js';
 export { sugerirFerramentas, sugerirFerramentasDefinition } from './sugerir.js';
+export { diagnosticarConsulta, diagnosticarConsultaTool } from './diagnosticar.js';
 
 import { analisePresencaTool } from './analise-presenca.js';
 import { rankingProposicoesTool } from './ranking-proposicoes.js';
@@ -15,6 +16,7 @@ import { comparativoVotacoesTool } from './comparativo-votacoes.js';
 import { timelineTramitacaoTool } from './timeline-tramitacao.js';
 import { exportarDadosTool } from './exportar-dados.js';
 import { sugerirFerramentasDefinition } from './sugerir.js';
+import { diagnosticarConsultaTool } from './diagnosticar.js';
 
 export const analisesTools = [
   analisePresencaTool,
@@ -23,5 +25,6 @@ export const analisesTools = [
   comparativoVotacoesTool,
   timelineTramitacaoTool,
   exportarDadosTool,
-  sugerirFerramentasDefinition
+  sugerirFerramentasDefinition,
+  diagnosticarConsultaTool
 ];

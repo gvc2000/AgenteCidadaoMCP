@@ -83,14 +83,14 @@ export const DateRangeSchema = z.object({
 // Paginação
 export const PaginationSchema = z.object({
   pagina: z.number().int().positive().default(1).optional(),
-  itens: z.number().int().min(1).max(100).default(25).optional()
+  itens: z.number().int().min(1).max(100).default(15).optional() // Reduzido de 25 para 15
 });
 
 export type Pagination = z.infer<typeof PaginationSchema>;
 
-// Ordenação
+// Ordenação - SEM defaults para evitar erros
 export const OrdenacaoSchema = z.object({
-  ordem: OrdemEnum.default('ASC').optional(),
+  ordem: OrdemEnum.optional(), // Removido default para evitar erros
   ordenarPor: z.string().optional()
 });
 

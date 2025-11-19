@@ -1,9 +1,10 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { createPaginacaoResposta, IdSchema, DateSchema, HoraSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
+import { formatZodError } from '../../core/errors.js';
 
 const BuscarEventosSchema = z.object({
   idTipoEvento: IdSchema.optional(),
@@ -25,7 +26,15 @@ export async function buscarEventos(params: BuscarEventosParams = {}) {
   const startTime = Date.now();
 
   try {
-    const validated = BuscarEventosSchema.parse(params);
+    let validated: BuscarEventosParams;
+    try {
+      validated = BuscarEventosSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw formatZodError(error);
+      }
+      throw error;
+    }
     const cacheKey = createCacheKey(validated);
     const cached = cacheManager.get<any>('eventos', cacheKey);
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
@@ -51,21 +60,65 @@ export async function buscarEventos(params: BuscarEventosParams = {}) {
 
 export const buscarEventosTool = {
   name: 'buscar_eventos',
-  description: 'Busca eventos da Câmara dos Deputados (reuniões, sessões, audiências, etc)',
+  description: 'Busca eventos da Câmara dos Deputados (reuniões, sessões, audiências). DICA: Use dataInicio + dataFim para buscar eventos em um período específico.',
   inputSchema: {
     type: 'object',
     properties: {
-      idTipoEvento: { type: 'number', description: 'ID do tipo de evento' },
-      idSituacao: { type: 'number', description: 'ID da situação do evento' },
-      idOrgao: { type: 'number', description: 'ID do órgão' },
-      dataInicio: { type: 'string', description: 'Data de início (YYYY-MM-DD)' },
-      dataFim: { type: 'string', description: 'Data de fim (YYYY-MM-DD)' },
-      horaInicio: { type: 'string', description: 'Hora de início (HH:MM)' },
-      horaFim: { type: 'string', description: 'Hora de fim (HH:MM)' },
-      pagina: { type: 'number', description: 'Número da página' },
-      itens: { type: 'number', description: 'Itens por página (1-100)' },
-      ordem: { type: 'string', enum: ['ASC', 'DESC'], description: 'Ordem de listagem' },
-      ordenarPor: { type: 'string', enum: ['dataHoraInicio', 'id'], description: 'Campo para ordenação' }
+      idTipoEvento: {
+        type: 'number',
+        description: 'ID do tipo de evento. Use listar_tipos_evento para ver opções'
+      },
+      idSituacao: {
+        type: 'number',
+        description: 'ID da situação do evento (ex: realizado, cancelado)'
+      },
+      idOrgao: {
+        type: 'number',
+        description: 'ID do órgão. Use buscar_orgaos para obter o ID'
+      },
+      dataInicio: {
+        type: 'string',
+        description: 'Data de início do período. Formato: YYYY-MM-DD',
+        examples: ['2024-01-01', '2024-11-01']
+      },
+      dataFim: {
+        type: 'string',
+        description: 'Data de fim do período. Formato: YYYY-MM-DD',
+        examples: ['2024-12-31', '2024-11-30']
+      },
+      horaInicio: {
+        type: 'string',
+        description: 'Hora de início. Formato: HH:MM',
+        examples: ['09:00', '14:00']
+      },
+      horaFim: {
+        type: 'string',
+        description: 'Hora de fim. Formato: HH:MM',
+        examples: ['12:00', '18:00']
+      },
+      pagina: {
+        type: 'number',
+        description: 'Número da página (padrão: 1)',
+        default: 1
+      },
+      itens: {
+        type: 'number',
+        description: 'Itens por página. Mínimo: 1, Máximo: 100 (padrão: 25)',
+        default: 25,
+        minimum: 1,
+        maximum: 100
+      },
+      ordem: {
+        type: 'string',
+        enum: ['ASC', 'DESC'],
+        description: 'Ordem de classificação',
+        default: 'DESC'
+      },
+      ordenarPor: {
+        type: 'string',
+        enum: ['dataHoraInicio', 'id'],
+        description: 'Campo para ordenação'
+      }
     }
   },
   handler: buscarEventos

@@ -1,9 +1,10 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { createPaginacaoResposta, IdSchema, DateSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
+import { formatZodError } from '../../core/errors.js';
 
 const BuscarVotacoesSchema = z.object({
   idProposicao: IdSchema.optional(),
@@ -23,7 +24,15 @@ export async function buscarVotacoes(params: BuscarVotacoesParams = {}) {
   const startTime = Date.now();
 
   try {
-    const validated = BuscarVotacoesSchema.parse(params);
+    let validated: BuscarVotacoesParams;
+    try {
+      validated = BuscarVotacoesSchema.parse(params);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        throw formatZodError(error);
+      }
+      throw error;
+    }
     const cacheKey = createCacheKey(validated);
     const cached = cacheManager.get<any>('votacoes', cacheKey);
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
@@ -49,19 +58,55 @@ export async function buscarVotacoes(params: BuscarVotacoesParams = {}) {
 
 export const buscarVotacoesTool = {
   name: 'buscar_votacoes',
-  description: 'Busca votações realizadas na Câmara dos Deputados',
+  description: 'Busca votações realizadas na Câmara dos Deputados. DICA: Comece com dataInicio + dataFim para buscar votações em um período, ou use idProposicao para votações de uma proposição específica.',
   inputSchema: {
     type: 'object',
     properties: {
-      idProposicao: { type: 'number', description: 'ID da proposição' },
-      idEvento: { type: 'number', description: 'ID do evento' },
-      idOrgao: { type: 'number', description: 'ID do órgão' },
-      dataInicio: { type: 'string', description: 'Data de início (YYYY-MM-DD)' },
-      dataFim: { type: 'string', description: 'Data de fim (YYYY-MM-DD)' },
-      pagina: { type: 'number', description: 'Número da página' },
-      itens: { type: 'number', description: 'Itens por página (1-100)' },
-      ordem: { type: 'string', enum: ['ASC', 'DESC'], description: 'Ordem de listagem' },
-      ordenarPor: { type: 'string', enum: ['dataHoraRegistro', 'id'], description: 'Campo para ordenação' }
+      idProposicao: {
+        type: 'number',
+        description: 'ID da proposição. Use buscar_proposicoes para obter o ID'
+      },
+      idEvento: {
+        type: 'number',
+        description: 'ID do evento/sessão. Use buscar_eventos para obter o ID'
+      },
+      idOrgao: {
+        type: 'number',
+        description: 'ID do órgão (comissão/plenário). Use buscar_orgaos para obter o ID'
+      },
+      dataInicio: {
+        type: 'string',
+        description: 'Data de início do período. Formato: YYYY-MM-DD',
+        examples: ['2024-01-01', '2024-06-01']
+      },
+      dataFim: {
+        type: 'string',
+        description: 'Data de fim do período. Formato: YYYY-MM-DD',
+        examples: ['2024-12-31', '2024-06-30']
+      },
+      pagina: {
+        type: 'number',
+        description: 'Número da página (padrão: 1)',
+        default: 1
+      },
+      itens: {
+        type: 'number',
+        description: 'Itens por página. Mínimo: 1, Máximo: 100 (padrão: 25)',
+        default: 25,
+        minimum: 1,
+        maximum: 100
+      },
+      ordem: {
+        type: 'string',
+        enum: ['ASC', 'DESC'],
+        description: 'Ordem de classificação',
+        default: 'DESC'
+      },
+      ordenarPor: {
+        type: 'string',
+        enum: ['dataHoraRegistro', 'id'],
+        description: 'Campo para ordenação'
+      }
     }
   },
   handler: buscarVotacoes

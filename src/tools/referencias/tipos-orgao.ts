@@ -31,7 +31,7 @@ export async function tiposOrgao(params: TiposOrgaoParams = {}) {
 
 export const tiposOrgaoTool = {
   name: 'tipos_orgao',
-  description: 'Lista os tipos de órgãos da Câmara (comissões, mesas, etc)',
+  description: 'Lista os tipos de órgãos da Câmara dos Deputados. Inclui: comissões permanentes (CCJC, CFT), comissões especiais, CPIs, Mesa Diretora, Plenário, etc. Use para filtrar órgãos por tipo em buscar_orgaos ou entender a estrutura organizacional da Câmara.',
   inputSchema: { type: 'object', properties: {} },
   handler: tiposOrgao
 };

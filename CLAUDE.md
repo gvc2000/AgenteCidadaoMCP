@@ -27,7 +27,7 @@ MCP Layer (mcp.ts) → Tools (tools/*) → Core (core/*) → API Client (api/cli
 ```
 ├── api/client.ts, normalizers.ts     # HTTP client, normalização
 ├── core/                              # Cache, rate-limiter, circuit-breaker, metrics, logging, errors, schemas
-├── tools/                             # 55 tools em 11 categorias
+├── tools/                             # 57 tools em 11 categorias
 │   ├── deputados/      (9)           # buscar, detalhar, despesas, discursos, eventos, frentes, ocupacoes, orgaos, profissoes
 │   ├── proposicoes/    (7)           # buscar, detalhar, autores, tramitacoes, votacoes, relacionadas, temas
 │   ├── votacoes/       (5)           # buscar, detalhar, votos, orientacoes, ultimas
@@ -38,7 +38,7 @@ MCP Layer (mcp.ts) → Tools (tools/*) → Core (core/*) → API Client (api/cli
 │   ├── blocos/         (2)           # buscar, detalhar
 │   ├── legislaturas/   (3)           # buscar, detalhar, mesa
 │   ├── referencias/    (5)           # situacoes, tipos_proposicao, tipos_orgao, tipos_evento, ufs
-│   └── analises/       (6)           # presenca, ranking, despesas_partido, comparativo, timeline, exportar
+│   └── analises/       (8)           # presenca, ranking, despesas_partido, comparativo, timeline, exportar, sugerir, diagnosticar
 └── utils/                             # aggregators, currency, date, sanitizers
 ```
 
@@ -151,6 +151,93 @@ Acesso: `import { CONFIG } from './config.js'`
 | `Cannot find module '*.js'` | Usar `.js` nos imports |
 | `Rate limit exceeded` | Aguardar ou ajustar `RATE_LIMIT_PER_MINUTE` |
 | `Circuit breaker open` | API externa indisponível, aguardar 60s |
+
+## Guia Rápido: Quando Usar Cada Tool
+
+### Tools de Ajuda (use primeiro!)
+- `sugerir_ferramentas` - Não sabe qual tool usar? Descreva o que quer e receba sugestões
+- `diagnosticar_consulta` - Receba um fluxo completo de tools para sua consulta
+
+### Fluxos Comuns
+
+**Buscar informações de deputado:**
+1. `buscar_deputados` (pelo nome) → obter ID
+2. `detalhar_deputado` (com ID) → dados completos
+3. `despesas_deputado` / `discursos_deputado` / `orgaos_deputado` → dados específicos
+
+**Acompanhar proposição:**
+1. `buscar_proposicoes` (por tipo/ano/keywords) → obter ID
+2. `detalhar_proposicao` → dados completos
+3. `tramitacoes_proposicao` → histórico de andamento
+4. `votacoes_proposicao` → resultado das votações
+
+**Analisar votações:**
+1. `buscar_votacoes` (por período) ou `ultimas_votacoes`
+2. `detalhar_votacao` → resultado geral
+3. `votos_votacao` → voto de cada deputado
+4. `orientacoes_votacao` → orientação dos partidos
+
+### Tabela Completa de Tools (57)
+
+| Categoria | Tool | Quando Usar |
+|-----------|------|-------------|
+| **Deputados** | `buscar_deputados` | Encontrar deputados por nome/UF/partido |
+| | `detalhar_deputado` | Dados completos (requer ID) |
+| | `despesas_deputado` | Gastos da cota parlamentar |
+| | `discursos_deputado` | Pronunciamentos em plenário |
+| | `eventos_deputado` | Eventos que participou |
+| | `frentes_deputado` | Frentes parlamentares que integra |
+| | `ocupacoes_deputado` | Histórico de ocupações |
+| | `orgaos_deputado` | Comissões que participa |
+| | `profissoes_deputado` | Profissões declaradas |
+| **Proposições** | `buscar_proposicoes` | Buscar PLs, PECs, MPs por filtros |
+| | `detalhar_proposicao` | Dados completos (requer ID) |
+| | `autores_proposicao` | Quem apresentou |
+| | `tramitacoes_proposicao` | Histórico de tramitação |
+| | `votacoes_proposicao` | Votações da proposição |
+| | `relacionadas_proposicao` | Proposições relacionadas |
+| | `temas_proposicao` | Temas/assuntos |
+| **Votações** | `buscar_votacoes` | Buscar votações por período |
+| | `detalhar_votacao` | Resultado geral |
+| | `votos_votacao` | Voto individual de cada deputado |
+| | `orientacoes_votacao` | Orientação dos partidos |
+| | `ultimas_votacoes` | Votações mais recentes |
+| **Eventos** | `buscar_eventos` | Buscar reuniões/sessões |
+| | `detalhar_evento` | Dados do evento |
+| | `deputados_evento` | Deputados presentes |
+| | `pauta_evento` | O que será discutido |
+| | `votacoes_evento` | Votações do evento |
+| | `orgaos_evento` | Órgãos participantes |
+| **Órgãos** | `buscar_orgaos` | Buscar comissões |
+| | `detalhar_orgao` | Dados do órgão |
+| | `membros_orgao` | Composição atual |
+| | `eventos_orgao` | Eventos do órgão |
+| | `votacoes_orgao` | Votações do órgão |
+| **Partidos** | `buscar_partidos` | Listar partidos |
+| | `detalhar_partido` | Dados do partido |
+| | `membros_partido` | Deputados do partido |
+| | `lideres_partido` | Liderança |
+| **Frentes** | `buscar_frentes` | Buscar frentes parlamentares |
+| | `detalhar_frente` | Dados da frente |
+| | `membros_frente` | Membros da frente |
+| **Blocos** | `buscar_blocos` | Buscar blocos partidários |
+| | `detalhar_bloco` | Dados do bloco |
+| **Legislaturas** | `buscar_legislaturas` | Listar legislaturas |
+| | `detalhar_legislatura` | Dados da legislatura |
+| | `mesa_legislatura` | Mesa Diretora |
+| **Referências** | `situacoes_proposicao` | IDs de situações (para filtrar) |
+| | `tipos_proposicao` | Siglas de tipos (PL, PEC, etc) |
+| | `tipos_orgao` | Tipos de órgãos |
+| | `tipos_evento` | Tipos de eventos |
+| | `ufs` | Lista de estados |
+| **Análises** | `analise_presenca` | Taxa de presença de deputados |
+| | `ranking_proposicoes` | Ranking de proposições |
+| | `analise_despesas_partido` | Despesas agregadas por partido |
+| | `comparativo_votacoes` | Comparar votações |
+| | `timeline_tramitacao` | Timeline visual de tramitação |
+| | `exportar_dados` | Exportar para CSV/JSON |
+| | `sugerir_ferramentas` | Sugere tools para sua consulta |
+| | `diagnosticar_consulta` | Fluxo completo recomendado |
 
 ## API Externa
 

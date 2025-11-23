@@ -223,6 +223,11 @@ export class CamaraAPIClient {
         }
 
         if (error instanceof CamaraAPIError && error.statusCode && params) {
+          // Log detalhado do erro da API para debug
+          if (error.details) {
+            console.error('API Error Details:', JSON.stringify(error.details, null, 2));
+          }
+
           throw createInformativeAPIError(
             error.statusCode,
             endpoint,

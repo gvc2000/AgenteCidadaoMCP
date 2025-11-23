@@ -8,18 +8,18 @@ interface CacheStrategy {
 }
 
 const CACHE_STRATEGIES: Record<string, CacheStrategy> = {
-  deputados: { ttl: 3600, maxSize: 1000 },      // 1h
-  proposicoes: { ttl: 1800, maxSize: 500 },     // 30min
-  votacoes: { ttl: 300, maxSize: 200 },         // 5min
-  eventos: { ttl: 600, maxSize: 300 },          // 10min
-  orgaos: { ttl: 7200, maxSize: 100 },          // 2h
-  frentes: { ttl: 86400, maxSize: 50 },         // 24h
-  partidos: { ttl: 3600, maxSize: 50 },         // 1h
-  blocos: { ttl: 3600, maxSize: 50 },           // 1h
-  legislaturas: { ttl: 86400, maxSize: 100 },   // 24h
-  referencias: { ttl: 604800, maxSize: 100 },   // 7 dias
-  despesas: { ttl: 86400, maxSize: 500 },       // 24h
-  analises: { ttl: 1800, maxSize: 200 }         // 30min
+  deputados: { ttl: 3600, maxSize: 1500 },      // 1h, aumentado maxSize
+  proposicoes: { ttl: 3600, maxSize: 800 },     // 1h (aumentado de 30min), aumentado maxSize
+  votacoes: { ttl: 1800, maxSize: 400 },        // 30min (aumentado de 5min), aumentado maxSize
+  eventos: { ttl: 1800, maxSize: 500 },         // 30min (aumentado de 10min), aumentado maxSize
+  orgaos: { ttl: 7200, maxSize: 200 },          // 2h, aumentado maxSize
+  frentes: { ttl: 86400, maxSize: 100 },        // 24h, aumentado maxSize
+  partidos: { ttl: 7200, maxSize: 100 },        // 2h (aumentado de 1h), aumentado maxSize
+  blocos: { ttl: 7200, maxSize: 100 },          // 2h (aumentado de 1h), aumentado maxSize
+  legislaturas: { ttl: 86400, maxSize: 200 },   // 24h, aumentado maxSize
+  referencias: { ttl: 604800, maxSize: 200 },   // 7 dias, aumentado maxSize
+  despesas: { ttl: 86400, maxSize: 1000 },      // 24h, aumentado maxSize
+  analises: { ttl: 3600, maxSize: 400 }         // 1h (aumentado de 30min), aumentado maxSize
 };
 
 class CacheManager {
@@ -43,7 +43,7 @@ class CacheManager {
           max: strategy.maxSize,
           ttl: strategy.ttl * 1000, // Converte para ms
           allowStale: false,
-          updateAgeOnGet: true,
+          updateAgeOnGet: false,  // Otimizado: não atualiza idade em cada get
           updateAgeOnHas: false
         })
       );

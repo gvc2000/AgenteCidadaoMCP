@@ -7,7 +7,7 @@ export const CONFIG = {
   api: {
     baseUrl: process.env.API_BASE_URL || 'https://dadosabertos.camara.leg.br/api/v2',
     openApiUrl: process.env.OPENAPI_URL || 'https://dadosabertos.camara.leg.br/swagger/api.json',
-    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '15000', 10),  // Reduzido para 15s
+    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '10000', 10),  // Reduzido para 10s (de 15s)
   },
 
   // Cache Configuration
@@ -50,15 +50,15 @@ export const CONFIG = {
 
   // Performance
   performance: {
-    maxConcurrentRequests: parseInt(process.env.MAX_CONCURRENT_REQUESTS || '10', 10),
-    queueMaxSize: parseInt(process.env.QUEUE_MAX_SIZE || '100', 10),
+    maxConcurrentRequests: parseInt(process.env.MAX_CONCURRENT_REQUESTS || '20', 10),  // Aumentado de 10 para 20
+    queueMaxSize: parseInt(process.env.QUEUE_MAX_SIZE || '200', 10),  // Aumentado de 100 para 200
   },
 
   // Retry Policy
   retry: {
-    maxRetries: parseInt(process.env.MAX_RETRIES || '2', 10),  // Reduzido de 3 para 2
-    delay: parseInt(process.env.RETRY_DELAY_MS || '500', 10),  // Reduzido de 1000ms para 500ms
-    jitter: parseInt(process.env.RETRY_JITTER_MS || '250', 10),  // Reduzido de 500ms para 250ms
+    maxRetries: parseInt(process.env.MAX_RETRIES || '2', 10),  // Mantido em 2
+    delay: parseInt(process.env.RETRY_DELAY_MS || '200', 10),  // Reduzido de 500ms para 200ms
+    jitter: parseInt(process.env.RETRY_JITTER_MS || '100', 10),  // Reduzido de 250ms para 100ms
   },
 
   // Development

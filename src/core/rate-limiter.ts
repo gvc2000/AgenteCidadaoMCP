@@ -29,6 +29,7 @@ class RateLimiter {
 
     this.refillTokens();
 
+    // Fast-path: se há tokens suficientes, retornar imediatamente
     if (this.state.tokens >= tokens) {
       this.state.tokens -= tokens;
       return;
@@ -37,8 +38,8 @@ class RateLimiter {
     // Não há tokens suficientes - esperar automaticamente
     const waitTime = this.calculateWaitTime(tokens);
 
-    // Se o tempo de espera for muito longo (>10s), lançar exceção
-    if (waitTime > 10000) {
+    // Se o tempo de espera for muito longo (>5s), lançar exceção (reduzido de 10s)
+    if (waitTime > 5000) {
       logger.warn({
         type: 'rate_limit',
         tokens: this.state.tokens,

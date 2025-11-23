@@ -1,0 +1,202 @@
+{
+  "name": "2. Monitor de Votações (10 em 10 min)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "name": "Schedule: A cada 10 min",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calcular período de busca (últimas 24 horas)\nconst agora = new Date();\nconst ontem = new Date(agora.getTime() - 24 * 60 * 60 * 1000);\n\nfunction formatDate(date) {\n  const year = date.getFullYear();\n  const month = String(date.getMonth() + 1).padStart(2, '0');\n  const day = String(date.getDate()).padStart(2, '0');\n  return `${year}-${month}-${day}`;\n}\n\nreturn [{\n  json: {\n    dataInicio: formatDate(ontem),\n    dataFim: formatDate(agora),\n    itens: 100,\n    ordem: 'DESC',\n    ordenarPor: 'dataHoraRegistro'\n  }\n}];"
+      },
+      "name": "Function: Calcular Período",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mcp-camara-br:9090/api/tools/buscar_votacoes",
+        "options": {},
+        "headerParametersJson": "{\n  \"Content-Type\": \"application/json\"\n}",
+        "bodyParametersJson": "={\n  \"dataInicio\": \"{{ $json.dataInicio }}\",\n  \"dataFim\": \"{{ $json.dataFim }}\",\n  \"itens\": {{ $json.itens }},\n  \"ordem\": \"{{ $json.ordem }}\",\n  \"ordenarPor\": \"{{ $json.ordenarPor }}\"\n}"
+      },
+      "name": "MCP: Buscar Votações",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const response = $input.item.json;\nconst votacoes = response.result?.data || [];\n\nif (votacoes.length === 0) {\n  return [];\n}\n\nreturn votacoes.map(vot => ({\n  json: {\n    id: vot.id,\n    data: vot.dataHoraRegistro,\n    descricao: vot.titulo || vot.proposicaoObjeto || '',\n    sigla_orgao: vot.siglaOrgao || null,\n    aprovada: vot.aprovacao === 1,\n    votos_sim: vot.placar?.find(p => p.orientacao === 'Sim')?.votos || 0,\n    votos_nao: vot.placar?.find(p => p.orientacao === 'Não')?.votos || 0,\n    votos_abstencao: vot.placar?.find(p => p.orientacao === 'Abstenção')?.votos || 0,\n    dados_completos: vot\n  }\n}));"
+      },
+      "name": "Function: Processar Votações",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [910, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO votacoes (id, data, descricao, sigla_orgao, aprovada, votos_sim, votos_nao, votos_abstencao, dados_completos)\nVALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\nON CONFLICT (id) DO UPDATE SET\n  data = EXCLUDED.data,\n  descricao = EXCLUDED.descricao,\n  aprovada = EXCLUDED.aprovada,\n  votos_sim = EXCLUDED.votos_sim,\n  votos_nao = EXCLUDED.votos_nao,\n  votos_abstencao = EXCLUDED.votos_abstencao,\n  dados_completos = EXCLUDED.dados_completos,\n  data_atualizacao = NOW()\nRETURNING *;",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "name": "Postgres: Salvar Votações",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1130, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $input.all().length }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "name": "IF: Tem votações novas?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1350, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const votacoes = $input.all();\nconst total = votacoes.length;\n\n// Criar mensagem de notificação\nconst mensagem = `🗳️ *${total} Nova(s) Votação(ões) Detectada(s)*\\n\\n` +\n  votacoes.slice(0, 5).map((v, i) => {\n    const aprovada = v.json.aprovada ? '✅' : '❌';\n    return `${i + 1}. ${aprovada} ${v.json.descricao.substring(0, 80)}...\\n   Sim: ${v.json.votos_sim} | Não: ${v.json.votos_nao}`;\n  }).join('\\n\\n');\n\nreturn [{\n  json: {\n    mensagem,\n    total,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "name": "Function: Formatar Notificação",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1570, 200]
+    },
+    {
+      "parameters": {
+        "text": "={{ $json.mensagem }}",
+        "additionalFields": {}
+      },
+      "name": "Slack/Discord/Telegram",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [1790, 200],
+      "notes": "Configure seu canal de notificação preferido aqui"
+    }
+  ],
+  "connections": {
+    "Schedule: A cada 10 min": {
+      "main": [
+        [
+          {
+            "node": "Function: Calcular Período",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Calcular Período": {
+      "main": [
+        [
+          {
+            "node": "MCP: Buscar Votações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP: Buscar Votações": {
+      "main": [
+        [
+          {
+            "node": "Function: Processar Votações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Processar Votações": {
+      "main": [
+        [
+          {
+            "node": "Postgres: Salvar Votações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres: Salvar Votações": {
+      "main": [
+        [
+          {
+            "node": "IF: Tem votações novas?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF: Tem votações novas?": {
+      "main": [
+        [
+          {
+            "node": "Function: Formatar Notificação",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Formatar Notificação": {
+      "main": [
+        [
+          {
+            "node": "Slack/Discord/Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "MCP Câmara",
+      "createdAt": "2025-11-23T00:00:00.000Z",
+      "updatedAt": "2025-11-23T00:00:00.000Z",
+      "id": "1"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-23T00:00:00.000Z",
+  "versionId": "1"
+}

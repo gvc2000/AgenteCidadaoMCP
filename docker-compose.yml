@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  # Banco de dados PostgreSQL (simula Supabase localmente)
+  postgres:
+    image: postgres:15-alpine
+    container_name: mcp-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=mcp_camara
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Servidor MCP Câmara BR
   mcp-camara-br:
     build: .
     container_name: mcp-camara-br
@@ -8,9 +29,11 @@ services:
       - "9090:9090"
     environment:
       - NODE_ENV=production
+      - PORT=9090
       - LOG_LEVEL=info
       - CACHE_ENABLED=true
       - METRICS_ENABLED=true
+      - RATE_LIMIT_ENABLED=true
     volumes:
       - ./logs:/var/log
     restart: unless-stopped
@@ -20,21 +43,77 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
 
-  # Optional: Redis for distributed caching
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: mcp-camara-redis
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 10s
-  #     timeout: 3s
-  #     retries: 3
+  # n8n - Automação de Workflows
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: mcp-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      # Básicas
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_HOST=localhost
+      - WEBHOOK_URL=http://localhost:5678
 
-# volumes:
-#   redis_data:
+      # Banco de dados
+      - DB_TYPE=postgresdb
+      - DB_POSTGRESDB_HOST=postgres
+      - DB_POSTGRESDB_PORT=5432
+      - DB_POSTGRESDB_DATABASE=mcp_camara
+      - DB_POSTGRESDB_USER=postgres
+      - DB_POSTGRESDB_PASSWORD=postgres
+      - DB_POSTGRESDB_SCHEMA=n8n
+
+      # Execuções
+      - EXECUTIONS_DATA_SAVE_ON_SUCCESS=all
+      - EXECUTIONS_DATA_SAVE_ON_ERROR=all
+      - EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS=true
+
+      # Timezone
+      - GENERIC_TIMEZONE=America/Sao_Paulo
+      - TZ=America/Sao_Paulo
+
+      # Segurança (ALTERE EM PRODUÇÃO!)
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+
+      # Logs
+      - N8N_LOG_LEVEL=info
+      - N8N_LOG_OUTPUT=console
+
+      # Encryption (ALTERE EM PRODUÇÃO!)
+      - N8N_ENCRYPTION_KEY=change-this-to-random-32-chars
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mcp-camara-br:
+        condition: service_healthy
+
+  # Redis para cache (opcional mas recomendado)
+  redis:
+    image: redis:7-alpine
+    container_name: mcp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  postgres_data:
+  n8n_data:
+  redis_data:

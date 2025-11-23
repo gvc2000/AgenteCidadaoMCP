@@ -1,0 +1,161 @@
+{
+  "name": "1. Sync Diário de Deputados",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule: Diário às 6h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://mcp-camara-br:9090/api/tools/buscar_deputados",
+        "options": {},
+        "headerParametersJson": "{\n  \"Content-Type\": \"application/json\"\n}",
+        "bodyParametersJson": "{\n  \"itens\": 600,\n  \"pagina\": 1,\n  \"ordem\": \"ASC\",\n  \"ordenarPor\": \"nome\"\n}"
+      },
+      "name": "MCP: Buscar Todos Deputados",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [470, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extrair dados da resposta MCP\nconst response = $input.item.json;\nconst deputados = response.result?.data || [];\n\n// Transformar para formato do banco\nreturn deputados.map(dep => ({\n  json: {\n    id: dep.id,\n    nome: dep.nome,\n    sigla_partido: dep.siglaPartido,\n    sigla_uf: dep.siglaUf,\n    email: dep.email || null,\n    url_foto: dep.urlFoto || null,\n    dados_completos: dep\n  }\n}));"
+      },
+      "name": "Function: Processar Dados",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO deputados (id, nome, sigla_partido, sigla_uf, email, url_foto, dados_completos)\nVALUES ($1, $2, $3, $4, $5, $6, $7)\nON CONFLICT (id) \nDO UPDATE SET\n  nome = EXCLUDED.nome,\n  sigla_partido = EXCLUDED.sigla_partido,\n  sigla_uf = EXCLUDED.sigla_uf,\n  email = EXCLUDED.email,\n  url_foto = EXCLUDED.url_foto,\n  dados_completos = EXCLUDED.dados_completos,\n  data_atualizacao = NOW()\nRETURNING *;",
+        "options": {
+          "queryBatching": "independently"
+        }
+      },
+      "name": "Postgres: Upsert Deputados",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [910, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const total = $input.all().length;\nconst sucesso = $input.all().filter(item => item.json.id).length;\n\nreturn [{\n  json: {\n    workflow_name: 'sync-deputados-diario',\n    status: 'success',\n    data: {\n      total_processados: total,\n      total_salvos: sucesso,\n      timestamp: new Date().toISOString()\n    }\n  }\n}];"
+      },
+      "name": "Function: Log Execução",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": "workflow_logs",
+        "columns": "workflow_name, status, data, created_at",
+        "options": {}
+      },
+      "name": "Postgres: Salvar Log",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2,
+      "position": [1350, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "Postgres Local"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule: Diário às 6h": {
+      "main": [
+        [
+          {
+            "node": "MCP: Buscar Todos Deputados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP: Buscar Todos Deputados": {
+      "main": [
+        [
+          {
+            "node": "Function: Processar Dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Processar Dados": {
+      "main": [
+        [
+          {
+            "node": "Postgres: Upsert Deputados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres: Upsert Deputados": {
+      "main": [
+        [
+          {
+            "node": "Function: Log Execução",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function: Log Execução": {
+      "main": [
+        [
+          {
+            "node": "Postgres: Salvar Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "MCP Câmara",
+      "createdAt": "2025-11-23T00:00:00.000Z",
+      "updatedAt": "2025-11-23T00:00:00.000Z",
+      "id": "1"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-23T00:00:00.000Z",
+  "versionId": "1"
+}

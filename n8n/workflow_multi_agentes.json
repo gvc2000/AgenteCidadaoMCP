@@ -1,0 +1,193 @@
+{
+    "name": "Agente Cidadão - Conselho Multi-Agentes",
+    "nodes": [
+        {
+            "parameters": {
+                "path": "chat",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook Chat",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.MCP_API_URL || 'https://seu-projeto.up.railway.app' }}/api/tools/buscar_proposicoes",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "ano",
+                            "value": "2024"
+                        },
+                        {
+                            "name": "itens",
+                            "value": "5"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "agent-legislative",
+            "name": "Agente Legislativo",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                350,
+                100
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.MCP_API_URL || 'https://seu-projeto.up.railway.app' }}/api/tools/buscar_deputados",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "itens",
+                            "value": "5"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "agent-political",
+            "name": "Agente Político",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                350,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.MCP_API_URL || 'https://seu-projeto.up.railway.app' }}/api/tools/despesas_deputado",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "id",
+                            "value": "204554"
+                        },
+                        {
+                            "name": "ano",
+                            "value": "2024"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "id": "agent-fiscal",
+            "name": "Agente Fiscal",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                350,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "mergeByIndex"
+            },
+            "id": "merge-results",
+            "name": "Sintetizador (Merge)",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 2,
+            "position": [
+                600,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "jsCode": "return [\n  {\n    json: {\n      legislativo: $input.all()[0].json,\n      politico: $input.all()[1].json,\n      fiscal: $input.all()[2].json,\n      sintese: \"Análise completa realizada pelo Conselho.\"\n    }\n  }\n];"
+            },
+            "id": "format-response",
+            "name": "Formatar Resposta",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 1,
+            "position": [
+                800,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Chat": {
+            "main": [
+                [
+                    {
+                        "node": "Agente Legislativo",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Agente Político",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Agente Fiscal",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Agente Legislativo": {
+            "main": [
+                [
+                    {
+                        "node": "Sintetizador (Merge)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Agente Político": {
+            "main": [
+                [
+                    {
+                        "node": "Sintetizador (Merge)",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Agente Fiscal": {
+            "main": [
+                [
+                    {
+                        "node": "Sintetizador (Merge)",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "Sintetizador (Merge)": {
+            "main": [
+                [
+                    {
+                        "node": "Formatar Resposta",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

@@ -1,5 +1,6 @@
 import { buscarDeputados, buscarDeputadosTool } from './buscar.js';
 import { detalharDeputado, detalharDeputadoTool } from './detalhar.js';
+import { obterPerfilCompleto, obterPerfilCompletoTool } from './perfil-completo.js';
 import { despesasDeputado, despesasDeputadoTool } from './despesas.js';
 import { discursosDeputado, discursosDeputadoTool } from './discursos.js';
 import { eventosDeputado, eventosDeputadoTool } from './eventos.js';
@@ -13,6 +14,8 @@ export {
   buscarDeputadosTool,
   detalharDeputado,
   detalharDeputadoTool,
+  obterPerfilCompleto,
+  obterPerfilCompletoTool,
   despesasDeputado,
   despesasDeputadoTool,
   discursosDeputado,
@@ -32,6 +35,7 @@ export {
 export const deputadosTools = [
   buscarDeputadosTool,
   detalharDeputadoTool,
+  obterPerfilCompletoTool,
   despesasDeputadoTool,
   discursosDeputadoTool,
   eventosDeputadoTool,

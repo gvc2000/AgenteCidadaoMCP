@@ -44,11 +44,30 @@ export async function buscarProposicoes(params: BuscarProposicoesParams) {
       }
       throw error;
     }
+    // OTIMIZAÇÃO: Se tem keywords mas não tem data, limita aos últimos 4 anos
+    // A busca textual completa na base histórica é muito lenta (>1min).
+    if (validated.keywords && !validated.ano && !validated.dataInicioApresentacao && !validated.dataInicio) {
+      const fourYearsAgo = new Date();
+      fourYearsAgo.setFullYear(fourYearsAgo.getFullYear() - 4);
+      validated.dataInicioApresentacao = fourYearsAgo.toISOString().split('T')[0];
+    }
+
     const cacheKey = createCacheKey(validated);
     const cached = cacheManager.get<any>('proposicoes', cacheKey);
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
 
-    const response = await camaraAPI.getWithPagination('/proposicoes', validated);
+    // Mapear parâmetros do schema para a API
+    const queryParams: any = { ...validated };
+    if (validated.dataInicioApresentacao) {
+      queryParams.dataApresentacaoInicio = validated.dataInicioApresentacao;
+      delete queryParams.dataInicioApresentacao;
+    }
+    if (validated.dataFimApresentacao) {
+      queryParams.dataApresentacaoFim = validated.dataFimApresentacao;
+      delete queryParams.dataFimApresentacao;
+    }
+
+    const response = await camaraAPI.getWithPagination('/proposicoes', queryParams);
 
     const proposicoes = DataNormalizer.normalizeArray(
       response.dados,

@@ -162,20 +162,12 @@ GET https://seu-projeto.up.railway.app/metrics/json
 
 ## 🔄 Integração com n8n
 
-### 1. Instalar n8n
+### 1. Deploy do n8n
 
-Se ainda não tem o n8n instalado:
+O n8n agora é gerenciado em um repositório separado: `gvc2000/n8n-AgenteCidadaoAgentico`.
 
-```bash
-# Via npm
-npm install -g n8n
+Siga as instruções no `README.md` daquele repositório para realizar o deploy.
 
-# Via Docker
-docker run -it --rm \
-  --name n8n \
-  -p 5678:5678 \
-  n8nio/n8n
-```
 
 ### 2. Configurar HTTP Request no n8n
 

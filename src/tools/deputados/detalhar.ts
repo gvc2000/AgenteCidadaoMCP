@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { DataNormalizer } from '../../api/normalizers.js';
-import { cacheManager, createCacheKey } from '../../core/cache.js';
 import { IdSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
@@ -19,13 +18,6 @@ export async function detalharDeputado(params: DetalharDeputadoParams) {
     // Validação
     const validated = DetalharDeputadoSchema.parse(params);
 
-    // Cache check
-    const cacheKey = createCacheKey(validated);
-    const cached = cacheManager.get<any>('deputados', cacheKey);
-    if (cached) {
-      return { ...cached, _metadata: { ...cached._metadata, cache: true } };
-    }
-
     // API call
     const response = await camaraAPI.get<any>(`/deputados/${validated.id}`);
 
@@ -35,14 +27,11 @@ export async function detalharDeputado(params: DetalharDeputadoParams) {
     const result = {
       deputado,
       _metadata: {
-        cache: false,
+        cache: false, // Será sobrescrito pelo cliente se houver cache
         latencyMs: Date.now() - startTime,
         apiVersion: 'v2'
       }
     };
-
-    // Cache set
-    cacheManager.set('deputados', cacheKey, result);
 
     // Métricas
     metricsCollector.incrementToolCall('detalhar_deputado');

@@ -162,22 +162,12 @@ GET https://seu-projeto.up.railway.app/metrics/json
 
 ## 🔄 Integração com n8n
 
-### 1. Deploy do n8n no Railway (Novo Serviço)
+### 1. Deploy do n8n
 
-Como já preparamos um `Dockerfile` customizado na pasta `n8n/`, o processo é simples:
+O n8n agora é gerenciado em um repositório separado: `gvc2000/n8n-AgenteCidadaoAgentico`.
 
-1. **Adicione um Novo Serviço** no seu projeto Railway.
-2. Selecione **GitHub Repo** e escolha este mesmo repositório (`AgenteCidadaoMCP`).
-3. **Configuração Importante**:
-   - Vá em **Settings** > **General** do novo serviço.
-   - Encontre **Root Directory** e altere para `/n8n`.
-   - Isso fará com que o Railway use o `Dockerfile` que criamos especificamente para o n8n.
-4. **Variáveis de Ambiente**:
-   - Adicione `N8N_ENCRYPTION_KEY` (gere uma chave aleatória).
-   - Adicione `MCP_API_URL` com a URL do seu serviço MCP (ex: `https://seu-mcp.up.railway.app`).
-5. **Aguarde o Deploy**.
+Siga as instruções no `README.md` daquele repositório para realizar o deploy.
 
-O n8n estará disponível na URL gerada pelo Railway (ex: `https://n8n-production.up.railway.app`).
 
 ### 2. Configurar HTTP Request no n8n
 

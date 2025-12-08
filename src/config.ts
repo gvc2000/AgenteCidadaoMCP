@@ -7,7 +7,7 @@ export const CONFIG = {
   api: {
     baseUrl: process.env.API_BASE_URL || 'https://dadosabertos.camara.leg.br/api/v2',
     openApiUrl: process.env.OPENAPI_URL || 'https://dadosabertos.camara.leg.br/swagger/api.json',
-    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '10000', 10),  // Reduzido para 10s (de 15s)
+    timeout: parseInt(process.env.REQUEST_TIMEOUT_MS || '45000', 10), // Aumentado para 45s (API da Câmara é lenta)
   },
 
   // Cache Configuration
@@ -30,8 +30,9 @@ export const CONFIG = {
   // Circuit Breaker
   circuitBreaker: {
     enabled: process.env.CIRCUIT_BREAKER_ENABLED !== 'false',
-    failureThreshold: parseInt(process.env.CIRCUIT_BREAKER_FAILURE_THRESHOLD || '5', 10),
-    resetTimeout: parseInt(process.env.CIRCUIT_BREAKER_RESET_TIMEOUT_MS || '60000', 10),
+    failureThreshold: parseInt(process.env.CIRCUIT_BREAKER_FAILURE_THRESHOLD || '15', 10), // Aumentado para 15 (API lenta)
+    resetTimeout: parseInt(process.env.CIRCUIT_BREAKER_RESET_TIMEOUT_MS || '20000', 10), // Reduzido para 20s (recuperação rápida)
+    halfOpenMaxAttempts: parseInt(process.env.CIRCUIT_BREAKER_HALF_OPEN_MAX || '5', 10), // 5 tentativas em half-open
   },
 
   // Logging
@@ -56,9 +57,9 @@ export const CONFIG = {
 
   // Retry Policy
   retry: {
-    maxRetries: parseInt(process.env.MAX_RETRIES || '2', 10),  // Mantido em 2
-    delay: parseInt(process.env.RETRY_DELAY_MS || '200', 10),  // Reduzido de 500ms para 200ms
-    jitter: parseInt(process.env.RETRY_JITTER_MS || '100', 10),  // Reduzido de 250ms para 100ms
+    maxRetries: parseInt(process.env.MAX_RETRIES || '4', 10), // 4 tentativas para API lenta
+    delay: parseInt(process.env.RETRY_DELAY_MS || '500', 10), // 500ms backoff inicial
+    jitter: parseInt(process.env.RETRY_JITTER_MS || '200', 10), // 200ms jitter
   },
 
   // Development

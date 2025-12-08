@@ -19,7 +19,7 @@
     "start:http": "node dist/http-server.js",
     "start:sse": "node dist/mcp-sse-server.js",
     "clean": "rimraf dist",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "test:coverage": "vitest --coverage",
     "test:watch": "vitest --watch",
     "lint": "eslint src --ext .ts",

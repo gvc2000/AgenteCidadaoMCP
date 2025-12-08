@@ -11,6 +11,7 @@ enum CircuitState {
 interface CircuitStats {
   failures: number;
   successes: number;
+  halfOpenAttempts: number; // Contador de tentativas em half-open
   lastFailureTime?: number;
   stateChangedAt: number;
 }
@@ -19,12 +20,14 @@ class CircuitBreaker {
   private enabled: boolean;
   private failureThreshold: number;
   private resetTimeout: number;
+  private halfOpenMaxAttempts: number;
   private endpoints: Map<string, { state: CircuitState; stats: CircuitStats }>;
 
   constructor() {
     this.enabled = CONFIG.circuitBreaker.enabled;
     this.failureThreshold = CONFIG.circuitBreaker.failureThreshold;
     this.resetTimeout = CONFIG.circuitBreaker.resetTimeout;
+    this.halfOpenMaxAttempts = CONFIG.circuitBreaker.halfOpenMaxAttempts ?? 3;
     this.endpoints = new Map();
   }
 
@@ -66,6 +69,7 @@ class CircuitBreaker {
         stats: {
           failures: 0,
           successes: 0,
+          halfOpenAttempts: 0,
           stateChangedAt: Date.now()
         }
       });
@@ -95,8 +99,13 @@ class CircuitBreaker {
     const endpointState = this.getEndpointState(endpoint);
     endpointState.stats.successes++;
     endpointState.stats.failures = 0;
+    endpointState.stats.halfOpenAttempts = 0;
 
     if (endpointState.state === CircuitState.HALF_OPEN) {
+      logger.info({
+        type: 'circuit_breaker',
+        endpoint
+      }, `Circuit recovered for ${endpoint}, closing circuit`);
       this.setEndpointState(endpoint, CircuitState.CLOSED);
     }
   }
@@ -106,7 +115,20 @@ class CircuitBreaker {
     endpointState.stats.failures++;
     endpointState.stats.lastFailureTime = Date.now();
 
-    if (endpointState.stats.failures >= this.failureThreshold) {
+    if (endpointState.state === CircuitState.HALF_OPEN) {
+      endpointState.stats.halfOpenAttempts++;
+
+      // Só volta para OPEN se exceder o máximo de tentativas em half-open
+      if (endpointState.stats.halfOpenAttempts >= this.halfOpenMaxAttempts) {
+        logger.warn({
+          type: 'circuit_breaker',
+          endpoint,
+          halfOpenAttempts: endpointState.stats.halfOpenAttempts
+        }, `Half-open attempts exhausted for ${endpoint}, returning to OPEN`);
+        this.setEndpointState(endpoint, CircuitState.OPEN);
+        endpointState.stats.halfOpenAttempts = 0;
+      }
+    } else if (endpointState.stats.failures >= this.failureThreshold) {
       this.setEndpointState(endpoint, CircuitState.OPEN);
     }
   }
@@ -144,10 +166,18 @@ class CircuitBreaker {
       endpointState.stats = {
         failures: 0,
         successes: 0,
+        halfOpenAttempts: 0,
         stateChangedAt: Date.now()
       };
+      logger.info({
+        type: 'circuit_breaker',
+        endpoint
+      }, `Circuit breaker manually reset for ${endpoint}`);
     } else {
       this.endpoints.clear();
+      logger.info({
+        type: 'circuit_breaker'
+      }, 'All circuit breakers reset');
     }
   }
 }

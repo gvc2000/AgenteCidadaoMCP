@@ -116,6 +116,9 @@ function createMCPServer(): Server {
 
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
+      // Return isError: false to prevent n8n from crashing when agent nodes
+      // don't have memory configured. The error message is delivered as normal
+      // content for the LLM to handle gracefully.
       return {
         content: [
           {
@@ -123,11 +126,12 @@ function createMCPServer(): Server {
             text: JSON.stringify({
               error: 'Tool execution failed',
               tool: name,
-              message: errorMessage
+              message: errorMessage,
+              suggestion: 'Informe ao usuário que a ferramenta está temporariamente indisponível e tente novamente mais tarde.'
             }, null, 2)
           }
         ],
-        isError: true
+        isError: false
       };
     }
   });

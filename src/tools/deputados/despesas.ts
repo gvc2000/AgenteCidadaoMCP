@@ -16,7 +16,8 @@ const DespesasDeputadoSchema = z.object({
   pagina: z.number().int().positive().default(1).optional(),
   itens: z.number().int().min(1).max(100).default(25).optional(),
   ordem: OrdemEnum.default('DESC').optional(),
-  ordenarPor: z.enum(['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']).optional()
+  ordenarPor: z.enum(['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']).optional(),
+  formato: z.enum(['completo', 'resumido']).default('completo').optional()
 });
 
 export type DespesasDeputadoParams = z.infer<typeof DespesasDeputadoSchema>;
@@ -52,14 +53,25 @@ export async function despesasDeputado(params: DespesasDeputadoParams) {
       queryParams
     );
 
-    // Normalização
-    const despesas = DataNormalizer.normalizeArray(
-      response.dados,
-      DataNormalizer.normalizeDespesa
-    );
+    // Normalização com formato otimizado
+    const formato = validated.formato || 'completo';
+    const despesas = formato === 'resumido'
+      ? response.dados.map((d: any) => ({
+          // Versão resumida - apenas campos essenciais
+          ano: d.ano,
+          mes: d.mes,
+          tipoDespesa: d.tipoDespesa,
+          dataDocumento: d.dataDocumento,
+          valorLiquido: d.valorLiquido,
+          nomeFornecedor: d.nomeFornecedor
+        }))
+      : DataNormalizer.normalizeArray(
+          response.dados,
+          DataNormalizer.normalizeDespesa
+        );
 
     // Calcular totais
-    const totalGasto = despesas.reduce((sum, d) => sum + d.valorLiquido, 0);
+    const totalGasto = despesas.reduce((sum: number, d: any) => sum + (d.valorLiquido || 0), 0);
     const totalDocumentos = despesas.length;
 
     // Paginação
@@ -106,7 +118,10 @@ export async function despesasDeputado(params: DespesasDeputadoParams) {
 
 export const despesasDeputadoTool = {
   name: 'despesas_deputado',
-  description: 'Lista as despesas de um deputado da cota parlamentar. Use buscar_deputados primeiro para obter o ID do deputado.',
+  description: `Lista as despesas de um deputado da cota parlamentar. Use buscar_deputados primeiro para obter o ID do deputado.
+
+  IMPORTANTE para agentes: Se você precisa de uma visão geral, use 'resumo_despesas_deputado' ao invés desta ferramenta.
+  Esta tool retorna documentos fiscais completos e pode gerar muito texto. Use formato='resumido' ou limite itens para evitar overflow.`,
   inputSchema: {
     type: 'object',
     properties: {
@@ -157,6 +172,12 @@ export const despesasDeputadoTool = {
         type: 'string',
         description: 'Campo para ordenação. Use "valorLiquido" para ver maiores/menores gastos',
         enum: ['ano', 'mes', 'dataDocumento', 'valorDocumento', 'valorLiquido']
+      },
+      formato: {
+        type: 'string',
+        description: 'Formato da resposta. "resumido" retorna apenas 6 campos essenciais (reduz payload ~70%). "completo" retorna todos os 18+ campos.',
+        enum: ['completo', 'resumido'],
+        default: 'completo'
       }
     },
     required: ['id']

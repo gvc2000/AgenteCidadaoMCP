@@ -27,8 +27,8 @@ MCP Layer (mcp.ts) → Tools (tools/*) → Core (core/*) → API Client (api/cli
 ```
 ├── api/client.ts, normalizers.ts     # HTTP client, normalização
 ├── core/                              # Cache, rate-limiter, circuit-breaker, metrics, logging, errors, schemas
-├── tools/                             # 57 tools em 11 categorias
-│   ├── deputados/      (9)           # buscar, detalhar, despesas, discursos, eventos, frentes, ocupacoes, orgaos, profissoes
+├── tools/                             # 58 tools em 11 categorias
+│   ├── deputados/      (10)          # buscar, detalhar, despesas, resumo-despesas, discursos, eventos, frentes, ocupacoes, orgaos, profissoes
 │   ├── proposicoes/    (7)           # buscar, detalhar, autores, tramitacoes, votacoes, relacionadas, temas
 │   ├── votacoes/       (5)           # buscar, detalhar, votos, orientacoes, ultimas
 │   ├── eventos/        (6)           # buscar, detalhar, deputados, pauta, votacoes, orgaos

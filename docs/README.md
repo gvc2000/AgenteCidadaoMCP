@@ -35,4 +35,4 @@ Esta pasta contém toda a documentação do projeto organizada por categoria.
 
 ---
 
-**Última atualização**: 2025-11-15
+**Última atualização**: 2025-12-12

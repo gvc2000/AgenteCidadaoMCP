@@ -64,7 +64,7 @@ Para sugerir novas funcionalidades:
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/AgenteCidadaoMCP.git
+git clone https://github.com/gvc2000/AgenteCidadaoMCP.git
 cd AgenteCidadaoMCP
 
 # Instale as dependências
@@ -365,4 +365,4 @@ Toda contribuição é valorizada, seja código, documentação, testes ou feedb
 
 ---
 
-**Última atualização**: 2025-11-15
+**Última atualização**: 2025-12-12

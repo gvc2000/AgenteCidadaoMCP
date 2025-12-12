@@ -92,15 +92,15 @@ Feche e abra o Claude Desktop novamente.
 Escolha o guia apropriado para seu sistema operacional:
 
 - **Windows 11/10**: Veja o [Guia de Instalação para Windows](./GUIA_INSTALACAO_WINDOWS.md)
-- **macOS/Linux**: Continue com as instruções abaixo ou veja o [Guia de Instalação Completo](./GUIA_INSTALACAO_USO.md)
-- **Início Rápido**: Para desenvolvedores experientes, veja [Início Rápido](./INICIO_RAPIDO.md)
+- **macOS/Linux**: Continue com as instruções abaixo ou veja o [Guia de Instalação Completo](./docs/guides/GUIA_INSTALACAO_USO.md)
+- **Início Rápido**: Para desenvolvedores experientes, veja [Início Rápido](./docs/guides/INICIO_RAPIDO.md)
 
 ## Instalação Completa
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/seu-usuario/mcp-camara-br.git
-cd mcp-camara-br
+git clone https://github.com/gvc2000/AgenteCidadaoMCP.git
+cd AgenteCidadaoMCP
 
 # Instalar dependências
 npm install
@@ -577,7 +577,7 @@ MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ## Suporte
 
-Para reportar bugs ou solicitar features, abra uma [issue](https://github.com/seu-usuario/mcp-camara-br/issues).
+Para reportar bugs ou solicitar features, abra uma [issue](https://github.com/gvc2000/AgenteCidadaoMCP/issues).
 
 ---
 

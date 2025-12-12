@@ -1126,8 +1126,8 @@ volumes:
 
 ## 📞 Contato e Suporte
 
-- **Repositório**: github.com/seu-usuario/mcp-camara-br
-- **Issues**: github.com/seu-usuario/mcp-camara-br/issues
+- **Repositório**: github.com/gvc2000/AgenteCidadaoMCP
+- **Issues**: github.com/gvc2000/AgenteCidadaoMCP/issues
 - **Docs**: mcp-camara-br.readthedocs.io
 - **API Original**: dadosabertos.camara.leg.br
 

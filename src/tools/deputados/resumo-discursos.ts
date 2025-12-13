@@ -57,7 +57,8 @@ export async function resumoDiscursosDeputado(params: ResumoDiscursosParams) {
     }
 
     // Preparar parâmetros - buscar TODOS os discursos do período
-    const { id, ...queryParams } = validated;
+    // IMPORTANTE: API não aceita 'keywords', apenas dataInicio/dataFim
+    const { id, keywords, ...queryParams } = validated;
 
     // API call - pegar todos os discursos (itens=100 é o máximo permitido)
     const response = await camaraAPI.getWithPagination(
@@ -118,8 +119,8 @@ export async function resumoDiscursosDeputado(params: ResumoDiscursosParams) {
     let discursosParaDestacar = discursos;
 
     // Se keywords fornecidas, filtrar por relevância
-    if (validated.keywords) {
-      const keywordsLower = validated.keywords.toLowerCase();
+    if (keywords) {
+      const keywordsLower = keywords.toLowerCase();
       discursosParaDestacar = discursos.filter((d: any) => {
         const texto = (d.transcricao || d.sumario || '').toLowerCase();
         return texto.includes(keywordsLower);
@@ -192,8 +193,8 @@ export async function resumoDiscursosDeputado(params: ResumoDiscursosParams) {
         apiVersion: 'v2',
         totalDiscursosAnalisados: discursos.length,
         discursosRetornados: discursosDestaque.length,
-        observacao: validated.keywords
-          ? `Filtrado por palavras-chave: "${validated.keywords}". Total antes do filtro: ${discursos.length}`
+        observacao: keywords
+          ? `Filtrado por palavras-chave: "${keywords}". Total antes do filtro: ${discursos.length}`
           : 'Resumo otimizado - retorna agregações e top 10 discursos resumidos. Use discursos_deputado com filtros para textos completos.'
       }
     };

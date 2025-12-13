@@ -177,13 +177,14 @@ Acesso: `import { CONFIG } from './config.js'`
 3. `votos_votacao` → voto de cada deputado
 4. `orientacoes_votacao` → orientação dos partidos
 
-### Tabela Completa de Tools (57)
+### Tabela Completa de Tools (58)
 
 | Categoria | Tool | Quando Usar |
 |-----------|------|-------------|
 | **Deputados** | `buscar_deputados` | Encontrar deputados por nome/UF/partido |
 | | `detalhar_deputado` | Dados completos (requer ID) |
-| | `despesas_deputado` | Gastos da cota parlamentar |
+| | `despesas_deputado` | Gastos da cota parlamentar (lista completa) |
+| | `resumo_despesas_deputado` | ⭐ Resumo otimizado de despesas (evita overflow) |
 | | `discursos_deputado` | Pronunciamentos em plenário |
 | | `eventos_deputado` | Eventos que participou |
 | | `frentes_deputado` | Frentes parlamentares que integra |
@@ -244,3 +245,15 @@ Acesso: `import { CONFIG } from './config.js'`
 **Base**: https://dadosabertos.camara.leg.br/api/v2
 **Docs**: https://dadosabertos.camara.leg.br/swagger/api.html
 **Auth**: Não requerida (API pública)
+
+## Integrações
+
+### Sistema Multi-Agentes n8n
+O servidor MCP é usado como backend de um sistema de orquestração multi-agente no n8n:
+- **Orquestrador**: Roteia perguntas para os agentes especializados
+- **Agente Legislativo**: Proposições e tramitações (Claude 3.5 Sonnet)
+- **Agente Político**: Perfil e atuação parlamentar (Claude 3.5 Sonnet)
+- **Agente Fiscal**: Despesas parlamentares (Claude 3.5 Sonnet)
+- **Sintetizador**: Consolida respostas (Gemini 2.5 Flash)
+
+**Documentação completa:** [docs/n8n/SISTEMA_MULTI_AGENTES.md](./docs/n8n/SISTEMA_MULTI_AGENTES.md)

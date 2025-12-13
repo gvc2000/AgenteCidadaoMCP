@@ -23,6 +23,11 @@ Esta pasta contém toda a documentação do projeto organizada por categoria.
 
 - [Especificação Completa MCP Câmara BR](./specs/mcp-camara-br-especificacao-completa.md) - Especificação técnica detalhada
 
+## 🤖 Integrações
+
+- [Sistema Multi-Agentes n8n](./n8n/SISTEMA_MULTI_AGENTES.md) - Arquitetura de orquestração multi-agente
+- [Índice n8n](./n8n/README.md) - Visão geral da integração n8n
+
 ## 🔄 Processo
 
 - [Descrição de PR](./process/PR_DESCRICAO.md) - Template de descrição de Pull Requests
@@ -35,4 +40,4 @@ Esta pasta contém toda a documentação do projeto organizada por categoria.
 
 ---
 
-**Última atualização**: 2025-12-12
+**Última atualização**: 2025-12-13

@@ -534,6 +534,9 @@ Os workflows estão em `.github/workflows/`:
 ### Especificações
 - [Especificação Técnica Completa](./docs/specs/mcp-camara-br-especificacao-completa.md) - Documentação técnica detalhada
 
+### Integrações
+- [Sistema Multi-Agentes n8n](./docs/n8n/SISTEMA_MULTI_AGENTES.md) - Arquitetura de orquestração de agentes especialistas
+
 ### Para Desenvolvedores
 - [Guia de Contribuição](./CONTRIBUTING.md) - Como contribuir com o projeto
 - [Guia para IA (CLAUDE.md)](./CLAUDE.md) - Instruções para assistentes de IA

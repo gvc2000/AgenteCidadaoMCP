@@ -1,7 +1,7 @@
 import { z, ZodError } from 'zod';
 import { camaraAPI } from '../../api/client.js';
 import { cacheManager, createCacheKey } from '../../core/cache.js';
-import { IdSchema, AnoSchema, DateSchema } from '../../core/schemas.js';
+import { IdSchema, DateSchema } from '../../core/schemas.js';
 import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
 import { formatZodError } from '../../core/errors.js';
@@ -13,7 +13,6 @@ import {
 
 const ResumoDiscursosSchema = z.object({
   id: IdSchema,
-  ano: AnoSchema.optional(),
   dataInicio: DateSchema.optional(),
   dataFim: DateSchema.optional(),
   keywords: z.string().optional()
@@ -72,9 +71,7 @@ export async function resumoDiscursosDeputado(params: ResumoDiscursosParams) {
       return {
         resumo: {
           totalDiscursos: 0,
-          periodo: validated.ano
-            ? `${validated.ano}`
-            : validated.dataInicio && validated.dataFim
+          periodo: validated.dataInicio && validated.dataFim
             ? `${validated.dataInicio} a ${validated.dataFim}`
             : 'Período consultado',
           mensagem: 'Nenhum discurso encontrado para o período especificado'
@@ -175,9 +172,7 @@ export async function resumoDiscursosDeputado(params: ResumoDiscursosParams) {
     const result = {
       resumo: {
         totalDiscursos: discursos.length,
-        periodo: validated.ano
-          ? `${validated.ano}`
-          : validated.dataInicio && validated.dataFim
+        periodo: validated.dataInicio && validated.dataFim
           ? `${validated.dataInicio} a ${validated.dataFim}`
           : 'Todos os períodos disponíveis',
         palavrasChaveMaisFrequentes: palavrasChaveGerais,
@@ -237,11 +232,6 @@ export const resumoDiscursosDeputadoTool = {
       id: {
         type: 'number',
         description: 'ID do deputado. OBRIGATÓRIO. Use buscar_deputados para obter o ID'
-      },
-      ano: {
-        type: 'number',
-        description: 'Ano dos discursos (2000 até ano atual). Recomendado: sempre especifique o ano para reduzir volume de dados',
-        examples: [2024, 2023, 2022]
       },
       dataInicio: {
         type: 'string',

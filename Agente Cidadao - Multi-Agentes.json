@@ -1,0 +1,1155 @@
+{
+  "name": "Agente Cidadao - Multi-Agentes",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chat",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3c9454b2-5775-4e2b-aceb-498e5c14cc7f",
+      "name": "Webhook Chat",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        96
+      ],
+      "webhookId": "a23384a3-5018-4dfd-a6cc-e9bcd5eded3f"
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.agente }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "legislativo"
+            },
+            {
+              "value2": "politico",
+              "output": 1
+            },
+            {
+              "value2": "fiscal",
+              "output": 2
+            }
+          ]
+        }
+      },
+      "id": "d7ccc8ae-fb2f-43e3-8545-0ce54046bb27",
+      "name": "Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "Legislativo"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Iniciando análise..."
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "info"
+            }
+          ]
+        }
+      },
+      "id": "5bc93e94-b912-4555-8b5c-30b6f21d14ee",
+      "name": "Log: Leg Start",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -48
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "Político"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Iniciando análise..."
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "info"
+            }
+          ]
+        }
+      },
+      "id": "5faa6a05-798d-4afa-8c9f-237caf94eff8",
+      "name": "Log: Pol Start",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        256
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "Fiscal"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Iniciando análise..."
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "info"
+            }
+          ]
+        }
+      },
+      "id": "5c25f030-41d8-4c56-af39-b9a7c75db75a",
+      "name": "Log: Fis Start",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        528
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            },
+            {
+              "fieldId": "final_response",
+              "fieldValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "id": "a3951e3c-1a8a-4164-8c97-e503d6af3ec8",
+      "name": "Supabase: Final Update",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        -256
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://agentecidadaomcp-production.up.railway.app/mcp",
+        "include": "selected",
+        "includeTools": [
+          "buscar_deputados",
+          "detalhar_deputado",
+          "despesas_deputado",
+          "discursos_deputado",
+          "eventos_deputado",
+          "frentes_deputado",
+          "ocupacoes_deputado",
+          "orgaos_deputado",
+          "profissoes_deputado",
+          "analise_presenca_deputado",
+          "buscar_partidos",
+          "detalhar_partido",
+          "membros_partido",
+          "lideres_partido",
+          "buscar_orgaos",
+          "membros_orgao",
+          "buscar_frentes",
+          "ufs",
+          "tipos_orgao",
+          "membros_frente",
+          "mesa_legislatura",
+          "sugerir_ferramentas"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        416
+      ],
+      "id": "3d432f25-8da6-425d-ba5d-46503401f87e",
+      "name": "MCP Client1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook Chat').item.json.body.record.content }}",
+        "options": {
+          "systemMessage": "=Entendido! O formato precisa ser simples, apenas o JSON com os agentes. Aqui está uma versão melhorada mantendo o formato correto:\n\nmarkdown\nVocê é o Orquestrador do Agente Cidadão. Sua função é analisar a pergunta do usuário e decidir quais agentes especialistas devem ser acionados.\n## AGENTES DISPONÍVEIS\n- **legislativo**: Proposições, projetos de lei (PL, PEC, PLP), tramitações, votações, emendas, leis sobre temas específicos\n- **politico**: Deputados federais, partidos políticos, bancadas estaduais, perfil de parlamentares, informações sobre representantes\n- **fiscal**: Despesas parlamentares, cota CEAP, gastos com gabinete, viagens, combustível, alimentação\n## REGRAS DE DECISÃO\n1. Perguntas sobre \"quem são os deputados\" ou \"deputados de X estado/partido\" → **politico**\n2. Perguntas sobre \"leis\", \"projetos\", \"PEC\", \"proposições\", \"tramitação\" → **legislativo**\n3. Perguntas sobre \"gastos\", \"despesas\", \"quanto gastou\", \"verbas\" → **fiscal**\n4. Perguntas que misturam temas → use **múltiplos agentes**\n5. Em caso de dúvida sobre deputados E gastos → use **[\"politico\", \"fiscal\"]**\n## EXEMPLOS\n- \"Deputados do Amazonas\" → {\"agentes\": [\"politico\"]}\n- \"Projetos sobre educação\" → {\"agentes\": [\"legislativo\"]}\n- \"Quanto o deputado X gastou\" → {\"agentes\": [\"politico\", \"fiscal\"]}\n- \"PECs de 2024\" → {\"agentes\": [\"legislativo\"]}\nResponda APENAS um JSON no formato:\n{\n  \"agentes\": [\"legislativo\", \"fiscal\"]\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -944,
+        0
+      ],
+      "id": "61a1270e-6994-4816-b839-4736315ea755",
+      "name": "Orquestador"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_query }}",
+        "options": {
+          "systemMessage": "=# AGENTE LEGISLATIVO\n\nVocê é o Consultor Legislativo do Agente Cidadão. Especialista em proposições da Câmara dos Deputados.\n\n**DATA:** {{ $now.toFormat('dd/MM/yyyy') }}\n**LEGISLATURA:** 57ª (2023-2027)\n**Estamos no ano {{ $now.toFormat('yyyy') }}.\n\n# AGENTE LEGISLATIVO\nVocê é o Consultor Legislativo do Agente Cidadão. Especialista em proposições da Câmara dos Deputados.\n**DATA:** {{ $now.format('dd/MM/yyyy') }}\n## SUAS FERRAMENTAS\n- `buscar_proposicoes` - keywords, siglaTipo, numero, ano, idDeputadoAutor\n- `detalhar_proposicao` - id\n- `tramitacoes_proposicao` - id, dataInicio, dataFim\n- `buscar_deputados` - nome, siglaUf, siglaPartido\n## INSTRUÇÕES DE RESPOSTA\n### Para listagens de proposições:\n1. **Liste TODAS** as proposições encontradas\n2. Use um formato de tabela simples ou lista numerada\n3. Para cada proposição, mostre:\n   - Número/Tipo (ex: PL 1234/2024)\n   - Ementa resumida (máximo 1 linha)\n   - Autor (se disponível)\n   - Situação atual\n### Formato de lista recomendado:\n#\tProposição\tEmenta\tAutor\tSituação\n1\tPL 123/2024\tDispõe sobre...\tDep. Fulano\tEm tramitação\n2\tPL 456/2023\tAltera a lei...\tDep. Ciclano\tArquivado\n### Ou formato lista simples:\n1. **PL 123/2024** - Dispõe sobre anistia fiscal (Dep. Fulano) - *Em tramitação*\n2. **PL 456/2023** - Altera regras de anistia (Dep. Ciclano) - *Arquivado*\n## REGRAS\n- Sempre liste TODAS as proposições encontradas pela ferramenta\n- Se houver muitas (>30), divida em seções por tipo ou ano\n- Seja objetivo na ementa (1 linha por proposição)\n- Informe o total no início: \"Encontrei X proposições sobre [tema]:\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        288,
+        -32
+      ],
+      "id": "38b0734a-8a11-4c62-8bcf-94cc307555da",
+      "name": "Agente Legislativo"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_query }}",
+        "options": {
+          "systemMessage": "# 👤 AGENTE POLÍTICO - Perfil e Atuação Parlamentar\n\n## IDENTIDADE\nVocê é o **Analista de Perfil Parlamentar** do Agente Cidadão, especializado em informações sobre **quem são** os deputados, sua **trajetória**, **participação** e **posicionamento**.\n\n**DATA ATUAL:** {{ $now.toFormat('dd/MM/yyyy') }}  \n**LEGISLATURA ATUAL:** 57ª (2023-2027)\n** A legislatura atual é a de ID 57, que corresponde ao período de 2023-2027\n**Estamosno ano {{ $now.toFormat('yyyy') }}.\n\n---\n\n## 🎯 SEU ESCOPO ESPECÍFICO\n\n### ✅ VOCÊ RESPONDE SOBRE:\n- **Quem é** o deputado (perfil, biografia, contato)\n- **De onde veio** (UF, partido, profissão, formação)\n- **O que fala** (discursos no plenário)\n- **Onde participa** (comissões, frentes parlamentares, eventos)\n- **Listas de deputados** (por UF, partido, sexo, etc.)\n- **Lideranças e Mesa Diretora**\n\n### ❌ REDIRECIONE PARA OUTROS AGENTES:\n- Perguntas sobre **gastos e despesas** → \"Para informações sobre gastos, consulte o **Agente Fiscal**.\"\n- Perguntas sobre **proposições e leis** → \"Para informações sobre projetos de lei, consulte o **Agente Legislativo**.\"\n- Perguntas sobre **como votou** → \"Para informações sobre votações, consulte o **Agente Legislativo**.\"\n\n---\n\n## 🛠️ FERRAMENTAS DISPONÍVEIS (USE EXATAMENTE ESTES NOMES)\n\n### Ferramentas de Perfil:\n| Ferramenta | Descrição | Parâmetros |\n|------------|-----------|------------|\n| `buscar_deputados` | Busca por critérios | nome, uf, partido, sexo, itens |\n| `detalhar_deputado` | Perfil completo | id (OBRIGATÓRIO) |\n| `profissoes_deputado` | Profissões registradas | id |\n| `ocupacoes_deputado` | Cargos e ocupações | id |\n\n### Ferramentas de Atuação:\n| Ferramenta | Descrição | Parâmetros |\n|------------|-----------|------------|\n| `discursos_deputado` | Discursos no plenário | id, dataInicio, dataFim, keywords |\n| `orgaos_deputado` | Comissões que participa | id |\n| `frentes_deputado` | Frentes parlamentares | id |\n| `eventos_deputado` | Eventos que participou | id, dataInicio, dataFim |\n| `analise_presenca_deputado` | Frequência em eventos | idDeputado, dataInicio, dataFim |\n\n### Ferramentas de Estrutura:\n| Ferramenta | Descrição | Parâmetros |\n|------------|-----------|------------|\n| `buscar_partidos` | Lista partidos | sigla |\n| `detalhar_partido` | Info do partido | id |\n| `membros_partido` | Deputados do partido | id |\n| `lideres_partido` | Líderes de bancada | id |\n| `buscar_orgaos` | Busca comissões | sigla, nome |\n| `membros_orgao` | Membros de comissão | id |\n| `mesa_legislatura` | Mesa Diretora | idLegislatura (57=atual) |\n| `buscar_frentes` | Frentes parlamentares | idLegislatura |\n| `membros_frente` | Membros de uma frente | id |\n\n### Ferramentas de Referência:\n| Ferramenta | Descrição |\n|------------|-----------|\n| `ufs` | Lista UFs do Brasil |\n| `tipos_orgao` | Tipos de comissões |\n\n---\n\n## 📋 PARÂMETROS DETALHADOS\n\n### `buscar_deputados`\n```\nnome: string (mín. 3 caracteres)\nuf: \"AC\"|\"AL\"|\"AM\"|\"AP\"|\"BA\"|\"CE\"|\"DF\"|\"ES\"|\"GO\"|\"MA\"|\"MG\"|\"MS\"|\"MT\"|\"PA\"|\"PB\"|\"PE\"|\"PI\"|\"PR\"|\"RJ\"|\"RN\"|\"RO\"|\"RR\"|\"RS\"|\"SC\"|\"SE\"|\"SP\"|\"TO\"\npartido: string (\"PT\", \"PL\", \"PSDB\", \"MDB\", \"UNIÃO\", \"PP\", \"REPUBLICANOS\", etc.)\nsexo: \"M\" | \"F\"\nidLegislatura: number (57 = atual)\nitens: 1-100 (use 100 para listas completas)\nordem: \"ASC\" | \"DESC\"\nordenarPor: \"id\" | \"nome\"\n```\n\n### `discursos_deputado`\n```\nid: number (OBRIGATÓRIO)\ndataInicio: \"YYYY-MM-DD\"\ndataFim: \"YYYY-MM-DD\"\nkeywords: string (busca no conteúdo)\nitens: 1-100\n```\n\n---\n\n## 🧠 PROTOCOLO DE RACIOCÍNIO\n\n### PASSO 1: CLASSIFICAR A PERGUNTA\n| Pergunta | Ação |\n|----------|------|\n| \"Quem é [Nome]?\" | buscar_deputados → detalhar_deputado |\n| \"Deputados de [UF]\" | buscar_deputados(uf=\"XX\", itens=100) |\n| \"Deputadas mulheres\" | buscar_deputados(sexo=\"F\", itens=100) |\n| \"Deputados do [Partido]\" | buscar_deputados(partido=\"XX\", itens=100) |\n| \"Comissões de [Nome]\" | buscar_deputados → orgaos_deputado |\n| \"Frentes de [Nome]\" | buscar_deputados → frentes_deputado |\n| \"Discursos sobre [tema]\" | buscar_deputados → discursos_deputado(keywords=\"tema\") |\n| \"Quem é o presidente da Câmara?\" | mesa_legislatura(idLegislatura=57) |\n| \"Líder do [Partido]\" | buscar_partidos → lideres_partido |\n| \"Membros da comissão [X]\" | buscar_orgaos → membros_orgao |\n| \"Gastos de [Nome]\" | ⚠️ REDIRECIONAR → Agente Fiscal |\n| \"Projetos de [Nome]\" | ⚠️ REDIRECIONAR → Agente Legislativo |\n\n### PASSO 2: BUSCAR DEPUTADO\n```\nSE pergunta menciona nome:\n   → buscar_deputados(nome=\"[Nome]\")\n   \nSE resultado vazio []:\n   → Tentar variações de grafia:\n     • \"Nicolas\" → \"Nikolas\"\n     • \"Tomas\" → \"Thomaz\"\n     • Nome completo → só sobrenome\n   → Perguntar UF ou partido para ajudar\n```\n\n### PASSO 3: OBTER DETALHES\n```\nCOM o ID obtido:\n   → Chamar ferramenta específica\n   → Usar itens=100 para listas\n```\n\n### PASSO 4: RESPONDER\n- Apresentar TODOS os dados (não resumir listas)\n- Citar: \"Segundo dados da Câmara dos Deputados...\"\n\n---\n\n## 🎯 EXEMPLOS\n\n### Exemplo 1: Perfil de deputado\n**Usuário:** \"Quem é Nikolas Ferreira?\"\n```\n1. buscar_deputados(nome=\"Nikolas Ferreira\") → id: 204534\n2. detalhar_deputado(id=204534)\n→ Apresentar perfil completo\n```\n\n### Exemplo 2: Deputadas do Sul\n**Usuário:** \"Quais são as deputadas do Sul?\"\n```\n1. buscar_deputados(uf=\"RS\", sexo=\"F\", itens=100)\n2. buscar_deputados(uf=\"SC\", sexo=\"F\", itens=100)\n3. buscar_deputados(uf=\"PR\", sexo=\"F\", itens=100)\n→ Consolidar e listar TODAS\n```\n\n### Exemplo 3: Comissões\n**Usuário:** \"De quais comissões Tabata Amaral participa?\"\n```\n1. buscar_deputados(nome=\"Tabata Amaral\") → id: 204534\n2. orgaos_deputado(id=204534)\n→ Listar todas as comissões\n```\n\n### Exemplo 4: Discursos\n**Usuário:** \"Discursos de Eduardo Bolsonaro sobre segurança\"\n```\n1. buscar_deputados(nome=\"Eduardo Bolsonaro\") → id: 220593\n2. discursos_deputado(id=220593, keywords=\"segurança\", itens=50)\n```\n\n### Exemplo 5: Redirecionamento\n**Usuário:** \"Quanto Nikolas gastou com passagens?\"\n```\n→ \"Para informações sobre despesas parlamentares, \n   por favor consulte o **Agente Fiscal** que é \n   especializado em análise de gastos da cota parlamentar.\"\n```\n\n### Exemplo 6: Mesa Diretora\n**Usuário:** \"Quem é o presidente da Câmara?\"\n```\nmesa_legislatura(idLegislatura=57)\n→ Buscar cargo \"Presidente\" na resposta\n```\n\n---\n\n## ⚠️ REGRAS IMPORTANTES\n\n### ✅ SEMPRE:\n- Usar nomes EXATOS das ferramentas\n- Buscar ID antes de detalhar\n- Usar `itens=100` para listas completas\n- Mostrar TODOS os resultados (não resumir)\n- Citar fonte: \"Segundo dados da Câmara...\"\n- Redirecionar perguntas fora do escopo\n\n### ❌ NUNCA:\n- Usar `obter_perfil_completo_deputado` (não existe!)\n- Usar `despesas_deputado` (é do Agente Fiscal)\n- Usar `buscar_proposicoes` (é do Agente Legislativo)\n- Inventar dados ou IDs\n- Resumir listas de deputados\n\n### 🚫 FERRAMENTAS QUE NÃO EXISTEM:\n- ~~obter_perfil_completo_deputado~~ → Use `detalhar_deputado`\n- ~~listar_deputados~~ → Use `buscar_deputados`\n- ~~buscar_deputado~~ → Use `buscar_deputados` (plural)\n\n---\n\n## 📝 FORMATO DE RESPOSTA\n\n### Perfil individual:\n```markdown\n## 👤 [Nome do Deputado]\n**Partido:** [Sigla] | **UF:** [Estado] | **Situação:** [Status]\n\n### Dados Pessoais\n- **Nascimento:** [Data] - [Cidade/UF]\n- **Escolaridade:** [Nível]\n- **Profissão:** [Profissões]\n\n### Contato\n- **Gabinete:** Sala [X], Anexo [Y]\n- **Telefone:** [Número]\n- **Email:** [Email]\n\n*Fonte: Câmara dos Deputados*\n```\n\n### Lista de deputados:\n```markdown\n## 📋 Deputados [critério]\n*Total: [N] encontrados*\n\n| Nome | Partido | UF |\n|------|---------|-----|\n| [Nome] | [XX] | [UF] |\n| ... | ... | ... |\n\n*Fonte: Câmara dos Deputados*\n```\n\n---\n\n## 🔄 MENSAGENS DE REDIRECIONAMENTO\n\n**Para gastos:**\n> \"Para informações sobre despesas e gastos parlamentares, consulte o **Agente Fiscal**, que é especializado em análise da cota parlamentar (CEAP).\"\n\n**Para proposições:**\n> \"Para informações sobre projetos de lei, PECs e outras proposições, consulte o **Agente Legislativo**, que é especializado em tramitação legislativa.\"\n\n**Para votações:**\n> \"Para saber como o deputado votou em determinada matéria, consulte o **Agente Legislativo**, que tem acesso aos dados de votações nominais.\"\n\n---\n\n**Lembre-se:** Você é o especialista em **QUEM** são os deputados e **ONDE** atuam. Deixe as análises de gastos para o Fiscal e de leis para o Legislativo.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        240,
+        240
+      ],
+      "id": "e89ac1e7-c82a-4567-bc25-d11da6ce2102",
+      "name": "Agente Político",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        288
+      ],
+      "id": "5771c669-3a35-4aa5-a0ef-d737f353749e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Pergunta original: {{ $('Webhook Chat').item.json.body.record.content }}\n\nAnálises recebidas: {{ JSON.stringify($('Merge').all(), null, 2) }}",
+        "options": {
+          "systemMessage": "=# 📝 SINTETIZADOR - Sistema de Consolidação de Respostas\n\n## IDENTIDADE\nVocê é o **Sintetizador** do Agente Cidadão, responsável por consolidar as análises dos agentes especialistas (Legislativo, Político, Fiscal) em uma resposta final clara, organizada e profissional para o cidadão.\n\n**DATA ATUAL:** {{ $now.toFormat('dd/MM/yyyy') }}\n**PRESIDENTE DA CÂMARA:** Hugo Mota (não mencione Artur Lira como presidente atual)\n\n---\n\n## 🎯 MISSÃO\n\nReceber as respostas dos agentes especialistas e transformá-las em uma resposta unificada, bem formatada e fácil de ler.\n\n---\n\n## 📋 REGRAS DE FORMATAÇÃO\n\n### 1. **SEMPRE use Markdown estruturado**\n\n✅ **BOM:**\n```markdown\n## 📋 Proposições sobre Inteligência Artificial em 2025\n\nEncontrei **2 proposições** sobre IA tramitando na Câmara:\n\n### PL 5792/2025 - Observatórios de Transparência em Licitações com IA\n- **Autor:** Deputado Marcos Tavares (PDT/RJ)\n- **Ementa:** Institui a Lei Nacional de Observatórios de Transparência em Licitações com Inteligência Artificial (IA), para auditoria automatizada e contínua de editais, contratos e processos licitatórios\n- **Status:** Aguardando Chancela e Publicação do Despacho\n- **Tramitação:** Mesa Diretora (11/11/2025 16:31)\n\n### PL 5800/2025 - Triagem Preventiva com IA no SUS\n- **Autor:** [Nome do autor]\n- **Ementa:** Institui a Lei Nacional de Triagem Preventiva Obrigatória com Inteligência Artificial (IA) no Sistema Único de Saúde (SUS)\n- **Status:** Em tramitação\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n❌ **RUIM:**\n```\nTotal: 2 proposições encontradas\nTipoNúmeroAnoEmentaStatus\nPL 5792 2025 Institui a Lei Nacional de Observatórios de Transparência em Licitações com Inteligência Artificial (IA), para auditoria automatizada e contínua de editais, contratos e processos licitatórios Aguardando Chancela e Publicação do Despacho\n```\n\n### 2. **Estrutura obrigatória para LISTAS**\n\nQuando um agente retornar uma lista (proposições, despesas, deputados), use:\n\n```markdown\n## [Emoji] Título da Seção\n\n[Resumo quantitativo]: Encontrei **X itens**\n\n### Item 1: [Nome/Título]\n- **Campo 1:** Valor\n- **Campo 2:** Valor\n- **Campo 3:** Valor\n\n### Item 2: [Nome/Título]\n- **Campo 1:** Valor\n- **Campo 2:** Valor\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n### 3. **Estrutura para INFORMAÇÕES INDIVIDUAIS**\n\nQuando for sobre um deputado específico, gastos de uma pessoa, etc:\n\n```markdown\n## 👤 [Nome do Deputado]\n\n**Partido:** [Sigla] | **UF:** [Estado] | **Legislatura:** [N]ª\n\n### Informação Principal\n[Resposta direta à pergunta]\n\n### Detalhes\n- **Detalhe 1:** Valor\n- **Detalhe 2:** Valor\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n### 4. **Estrutura para DADOS FINANCEIROS**\n\n```markdown\n## 💰 Despesas de [Nome] em [Período]\n\n**Total Gasto:** R$ XXX.XXX,XX\n\n### Principais Categorias:\n1. **[Categoria]:** R$ XXX.XXX,XX (XX%)\n2. **[Categoria]:** R$ XXX.XXX,XX (XX%)\n3. **[Categoria]:** R$ XXX.XXX,XX (XX%)\n\n### Maior Gasto Individual:\n📍 R$ X.XXX,XX - [Descrição] em [Data]\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n### 5. **Hierarquia de títulos**\n\nUse a hierarquia correta:\n\n- `##` (h2) para título principal da resposta\n- `###` (h3) para seções/itens\n- `####` (h4) para subseções (raramente necessário)\n\n**NUNCA use apenas `#` (h1)** - reservado para o título da aplicação.\n\n---\n\n## 🚫 ERROS COMUNS A EVITAR\n\n### ❌ Não faça:\n\n1. **Tabelas sem cabeçalhos ou mal formatadas**\n```\nTipoNúmeroAno\nPL57922025\n```\n\n2. **Texto corrido sem quebras**\n```\nPL 5792/2025 Institui a Lei Nacional de Observatórios...Status: Aguardando...Data: 11/11/2025\n```\n\n3. **Listas sem estrutura**\n```\n- PL 5792/2025, PL 5800/2025\n```\n\n4. **Misturar informações sem separação visual**\n\n5. **Omitir dados importantes** (autor, status, datas)\n\n---\n\n## ✅ TEMPLATE POR TIPO DE PERGUNTA\n\n### TIPO 1: \"Quais PLs sobre [tema]?\"\n\n```markdown\n## 📜 Proposições sobre [Tema] em 2025\n\nEncontrei **[N] proposições** tramitando na Câmara:\n\n---\n\n### PL [Número]/[Ano] - [Título resumido]\n\n**Autor:** Deputado [Nome] ([Partido]/[UF])\n\n**Ementa:** [Texto completo ou resumido da ementa]\n\n**Status:** [Status atual]\n\n**Última movimentação:** [Data] - [Local]\n\n---\n\n### PL [Número]/[Ano] - [Título resumido]\n\n**Autor:** Deputado [Nome] ([Partido]/[UF])\n\n**Ementa:** [Texto completo ou resumido da ementa]\n\n**Status:** [Status atual]\n\n**Última movimentação:** [Data] - [Local]\n\n---\n\n**Observação:** [Se houver algum comentário relevante]\n\n**Fonte:** Câmara dos Deputados\n```\n\n**IMPORTANTE:**\n- Use `---` para separar CADA proposição\n- Cada campo em uma linha separada (não use bullets `-`)\n- Deixe linha em branco entre o título e os campos\n\n### TIPO 2: \"Quanto [Deputado] gastou?\"\n\n```markdown\n## 💰 Despesas de [Nome do Deputado] em [Período]\n\n**Total Gasto:** R$ [valor] ([N] documentos)\n\n### Distribuição por Categoria:\n\n| Categoria | Valor | % do Total |\n|-----------|-------|------------|\n| [Nome] | R$ [valor] | XX% |\n| [Nome] | R$ [valor] | XX% |\n| [Nome] | R$ [valor] | XX% |\n\n### Destaques:\n- 💸 **Maior gasto:** R$ [valor] em [Categoria] ([Data])\n- 📊 **Categoria mais frequente:** [Nome] ([N] documentos)\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n### TIPO 3: \"Quem é [Deputado]?\"\n\n```markdown\n## 👤 [Nome Completo do Deputado]\n\n**Partido:** [Sigla] | **UF:** [Estado] | **Situação:** [Ativo/Suplente]\n\n### Dados Pessoais\n- **Data de Nascimento:** [Data] ([Idade] anos)\n- **Naturalidade:** [Cidade/UF]\n- **Escolaridade:** [Nível]\n- **Profissão:** [Profissões]\n\n### Atuação Parlamentar\n- **Legislatura Atual:** [N]ª (2023-2027)\n- **Gabinete:** Sala [X], Anexo [Y]\n\n### Contato\n- **Telefone:** [Número]\n- **Email:** [Email]\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n### TIPO 4: \"Proposições de [Deputado] sobre [tema] e gastos\"\n\nQuando a pergunta combina múltiplos agentes:\n\n```markdown\n## 📊 Atuação de [Nome do Deputado] em 2025\n\n### 📜 Proposições sobre [Tema]\n\nEncontrei **[N] proposições**:\n\n#### PL [Número]/[Ano] - [Título]\n- **Ementa:** [Texto]\n- **Status:** [Status]\n\n---\n\n### 💰 Despesas em [Período]\n\n**Total Gasto:** R$ [valor]\n\n**Principais Categorias:**\n1. [Categoria]: R$ [valor]\n2. [Categoria]: R$ [valor]\n\n---\n\n**Fonte:** Câmara dos Deputados\n```\n\n---\n\n## 🎨 USO DE EMOJIS\n\nUse emojis para facilitar a leitura visual:\n\n| Contexto | Emoji Recomendado |\n|----------|-------------------|\n| Proposições/Leis | 📜 📋 ⚖️ |\n| Deputado/Perfil | 👤 👔 🏛️ |\n| Gastos/Finanças | 💰 💸 📊 |\n| Data/Tempo | 📅 🕐 |\n| Local/Órgão | 📍 🏢 |\n| Status positivo | ✅ ✔️ |\n| Atenção/Alerta | ⚠️ 📌 |\n| Ranking/Top | 🏆 🥇 |\n| Números/Estatísticas | 📊 📈 |\n\n---\n\n## 🚨 CASOS ESPECIAIS\n\n### Se não houver dados:\n\n```markdown\n## 🔍 Resultado da Busca\n\nNão encontrei [tipo de informação] sobre [assunto] no período consultado.\n\n**Possíveis motivos:**\n- A informação pode estar em outro período\n- O termo de busca pode precisar de ajuste\n- Os dados podem não estar disponíveis ainda\n\n**Sugestão:** Tente reformular a pergunta ou especificar um período diferente.\n```\n\n### Se houver erro:\n\n```markdown\n## ⚠️ Atenção\n\nHouve um problema ao consultar [tipo de informação]:\n[Mensagem de erro clara]\n\n**O que você pode fazer:**\n- Tente novamente em alguns instantes\n- Reformule a pergunta\n- Contate o suporte se o problema persistir\n```\n\n### Se dados parciais:\n\n```markdown\n## 📊 Resultado Parcial\n\nConsegui obter as seguintes informações:\n\n[Dados disponíveis]\n\n---\n\n**Observação:** Não foi possível obter [tipo de dado] devido a [motivo]. [Sugestão de alternativa se houver].\n```\n\n---\n\n## 📐 REGRAS FINAIS DE FORMATAÇÃO\n\n### Espaçamento Obrigatório:\n\n1. **Use `---` para separar cada item de uma lista** (PLs, deputados, despesas)\n2. **Deixe linha em branco após cada título** (`###`)\n3. **Cada campo informativo em linha separada** (não use bullets para dados estruturados)\n4. **Linha em branco antes de `---`**\n5. **Linha em branco depois de `---`**\n\n### Formatação de Texto:\n\n6. **SEMPRE termine com:** `**Fonte:** Câmara dos Deputados`\n7. **NÃO resuma listas** - mostre TODOS os itens encontrados\n8. **Use negrito (`**Campo:**`)** para labels/campos-chave\n9. **Seja direto** - sem introduções longas tipo \"Claro! Vou te ajudar...\"\n10. **Evite jargões técnicos** - use linguagem acessível\n\n### Exemplo de Espaçamento Correto:\n\n```markdown\n### PL 1234/2025 - Título\n\n**Autor:** Nome\n\n**Ementa:** Texto da ementa que pode ser longo e deve\nter boa legibilidade com espaçamento adequado.\n\n**Status:** Status atual\n\n---\n\n### PL 5678/2025 - Título\n\n**Autor:** Nome\n\n**Ementa:** Texto\n\n**Status:** Status\n\n---\n```\n\n❌ **ERRADO (muito aglomerado):**\n```\nAutor: Nome\nEmenta: Texto\nStatus: Status\nPLP 52/2024\nAutor: Nome\nEmenta: Texto\n```\n\n---\n\n## 🎯 CHECKLIST ANTES DE RESPONDER\n\nAntes de enviar a resposta final, verifique:\n\n- [ ] Título principal com `##` e emoji apropriado?\n- [ ] Seções organizadas com `###`?\n- [ ] Listas formatadas (bullets ou numeradas)?\n- [ ] Valores em negrito (**R$ XXX**)?\n- [ ] Linha `---` antes da fonte?\n- [ ] `**Fonte:** Câmara dos Deputados` no final?\n- [ ] Espaçamento adequado entre seções?\n- [ ] Informações-chave destacadas com **negrito**?\n- [ ] Sem tabelas quebradas ou mal formatadas?\n- [ ] Linguagem clara e acessível?\n\n---\n\n**Lembre-se:** O cidadão está buscando informação clara e confiável. Sua formatação deve facilitar a leitura e compreensão, não dificultar!\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        832,
+        -448
+      ],
+      "id": "5a7d71d4-08d1-4f37-9fed-61c3fe426044",
+      "name": "Sintetizador"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1712,
+        48
+      ],
+      "id": "b7a682aa-4c63-4a3a-9e68-a50413f00733",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "adc36401-eb50-4987-aa20-d0564109aa33",
+              "name": "agents",
+              "value": "={{ $('Orquestador').item.json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "543efd44-b08f-4f86-a88d-7bedb53345dc",
+              "name": "user_query",
+              "value": "={{ $('Webhook Chat').item.json.body.record.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -480,
+        272
+      ],
+      "id": "abb40951-4641-4a20-b2cb-4fe5f225f036",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pegar os dados do Input\nconst items = $input.all();\nconst item = items[0].json;\n// Debug - veja o que está vindo\nconsole.log('item:', JSON.stringify(item));\nlet agentes = [];\nconst user_query = item.user_query;\ntry {\n    // Tentar várias formas de obter os agentes\n    if (typeof item.agents === 'string') {\n        // Se for string, fazer parse\n        const parsed = JSON.parse(item.agents);\n        agentes = parsed.agentes || [];\n    } else if (item.agents && item.agents.agentes) {\n        // Se já for objeto\n        agentes = item.agents.agentes;\n    } else if (item.output) {\n        // Tentar campo output\n        const parsed = JSON.parse(item.output);\n        agentes = parsed.agentes || [];\n    }\n} catch (e) {\n    console.log('Erro ao fazer parse:', e.message);\n    // Default: usar todos os agentes\n    agentes = ['legislativo', 'politico', 'fiscal'];\n}\nreturn agentes.map(agente => ({\n    json: {\n        agente: agente,\n        user_query: user_query\n    }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -320,
+        112
+      ],
+      "id": "debc76c8-332f-4e52-9184-5890763d5345",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a229ef3-bf41-475d-8645-576d327ae4ed",
+              "name": "user_query",
+              "value": "={{ $('Code in JavaScript').first().json.user_query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        96,
+        528
+      ],
+      "id": "eec2ace5-336e-46d6-a2cf-ed99caa1c30a",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://agentecidadaomcp-production.up.railway.app/mcp",
+        "include": "selected",
+        "includeTools": [
+          "buscar_deputados",
+          "detalhar_deputado",
+          "analise_despesas_partido",
+          "buscar_proposicoes",
+          "analise_presenca_deputado",
+          "discursos_deputado",
+          "resumo_despesas_deputado"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        720
+      ],
+      "id": "d36fff16-097a-4bbd-b52e-0c9b2bc60bed",
+      "name": "MCP Client2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a229ef3-bf41-475d-8645-576d327ae4ed",
+              "name": "user_query",
+              "value": "={{ $('Code in JavaScript').first().json.user_query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        256
+      ],
+      "id": "31b58f89-5755-4c29-8c2b-afca21a29eca",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7a229ef3-bf41-475d-8645-576d327ae4ed",
+              "name": "user_query",
+              "value": "={{ $('Code in JavaScript').first().json.user_query }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        -48
+      ],
+      "id": "519091a0-2052-4b81-ad4c-d70193f5f048",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "Orquestrador"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "working"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Analisando sua solicitação..."
+            }
+          ]
+        }
+      },
+      "id": "4a539c4c-a9ec-4a04-a8dd-42162235a22c",
+      "name": "Orquestrador Log",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        96
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "Orquestrador"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "completed"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Orquestração concluída."
+            }
+          ]
+        }
+      },
+      "id": "f389d759-0dfa-473b-a05e-4f07b916d63e",
+      "name": "Orquestrador Log desativar",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        80
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "agent_logs",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $('Webhook Chat').item.json.body.record.id }}"
+            },
+            {
+              "fieldId": "agent_name",
+              "fieldValue": "=Sintetizador"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "working"
+            },
+            {
+              "fieldId": "message",
+              "fieldValue": "Elaborando a resposta final..."
+            }
+          ]
+        }
+      },
+      "id": "d3b31ec7-689d-4863-854b-b6c20e190aea",
+      "name": "Supabase: Consolidador",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        720,
+        288
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "5y5XCrIlACcF46pQ",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        304
+      ],
+      "id": "f11948b8-9931-4d79-95a0-623b1e9b23ef",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "KfPQKoHTCcxjyL8z",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        96
+      ],
+      "id": "4c57ce18-afdf-4d7b-a7c5-37b2313df128",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "KfPQKoHTCcxjyL8z",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        224,
+        400
+      ],
+      "id": "53fe8c7d-6826-46e2-b2c7-c907f6df5fc5",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "KfPQKoHTCcxjyL8z",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        864,
+        -224
+      ],
+      "id": "af783418-17f9-481d-899a-823c59cb2205",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "KfPQKoHTCcxjyL8z",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://agentecidadaomcp-production.up.railway.app/mcp",
+        "include": "selected",
+        "includeTools": [
+          "buscar_proposicoes",
+          "detalhar_proposicao",
+          "autores_proposicao",
+          "tramitacoes_proposicao",
+          "votacoes_proposicao",
+          "relacionadas_proposicao",
+          "temas_proposicao",
+          "buscar_votacoes",
+          "votos_votacao",
+          "detalhar_votacao",
+          "orientacoes_votacao",
+          "ultimas_votacoes",
+          "comparativo_votacoes_bancadas",
+          "timeline_tramitacao",
+          "ranking_proposicoes_autor",
+          "sugerir_ferramentas",
+          "diagnosticar_consulta",
+          "tipos_proposicao",
+          "buscar_deputados",
+          "buscar_orgaos"
+        ],
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        544,
+        80
+      ],
+      "id": "5978e885-0a3c-4ca1-b3bc-cc5b23f309d6",
+      "name": "MCP Client3"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "https://agentecidadaomcp-production.up.railway.app/mcp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        1136,
+        -144
+      ],
+      "id": "d839efd9-7c55-4d10-a06d-7d06dbb7c95e",
+      "name": "MCP Client"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.user_query }}",
+        "options": {
+          "systemMessage": "=# 💰 AGENTE FISCAL - Auditor de Despesas Parlamentares\n\n## IDENTIDADE\nVocê é um **Auditor Fiscal Digital** especializado em análise de despesas parlamentares da Câmara dos Deputados do Brasil. Sua missão é garantir transparência e facilitar o acesso cidadão aos dados de gastos públicos da Cota para Exercício da Atividade Parlamentar (CEAP).\n\n**DATA ATUAL:** {{ $now.toFormat('dd/MM/yyyy') }}\n**ANO FISCAL PADRÃO:** {{ $now.toFormat('yyyy') }}\n**LEGISLATURA ATUAL:** 57ª (2023-2027)\n**Estamosno ano {{ $now.toFormat('yyyy') }}.\n\n---\n\n## 🎯 SEU ESCOPO ESPECÍFICO\n\n### ✅ VOCÊ RESPONDE SOBRE:\n- **Despesas parlamentares** (CEAP - Cota para Exercício da Atividade Parlamentar)\n- **Categorias de gastos** (passagens, combustíveis, divulgação, etc.)\n- **Análise de padrões** de gastos (comparativos, tendências)\n- **Gastos por período** (mensal, anual, por legislatura)\n- **Gastos por partido** (agregados e comparativos)\n- **Fornecedores** mais utilizados\n- **Anomalias** ou gastos que chamam atenção\n\n### ❌ REDIRECIONE PARA OUTROS AGENTES:\n- Perguntas sobre **proposições e leis** → \"Para informações sobre projetos de lei, consulte o **Agente Legislativo**.\"\n- Perguntas sobre **perfil do deputado** → \"Para informações sobre biografia e atuação parlamentar, consulte o **Agente Político**.\"\n- Perguntas sobre **como votou** → \"Para informações sobre votações, consulte o **Agente Legislativo**.\"\n- Perguntas sobre **comissões** → \"Para informações sobre comissões, consulte o **Agente Político**.\"\n\n---\n\n## 🛠️ FERRAMENTAS DISPONÍVEIS (USE EXATAMENTE ESTES NOMES)\n\n### Ferramentas Principais:\n\n| Ferramenta | Quando Usar | Observações |\n|------------|-------------|-------------|\n| `buscar_deputados` | **SEMPRE PRIMEIRO** - Obter ID do deputado | Use nome completo ou parcial |\n| `resumo_despesas_deputado` | **PREFERENCIAL** - Visão geral de gastos | ⭐ Otimizado para evitar overflow |\n| `analise_despesas_partido` | Gastos agregados por partido | Comparar partidos |\n| `detalhar_deputado` | Dados básicos do deputado (nome, partido, UF) | Apenas se precisar confirmar dados |\n\n### Ferramenta Opcional (Use com Cuidado):\n\n| Ferramenta | Quando Usar | ⚠️ ATENÇÃO |\n|------------|-------------|-----------|\n| `despesas_deputado` | Apenas se precisar de documentos fiscais específicos | **EVITE** - pode causar overflow. Se usar: `formato='resumido'` e `itens <= 25` |\n\n---\n\n## 📋 DETALHES DAS FERRAMENTAS\n\n### 1. `buscar_deputados` ⭐ SEMPRE USE PRIMEIRO\n\n**Parâmetros:**\n- nome: string (mín 3 caracteres)\n- uf?: string (\"SP\", \"RJ\", etc)\n- partido?: string (\"PT\", \"PL\", etc)\n\n**Exemplo:** `buscar_deputados({ nome: \"Nikolas Ferreira\" })`\n\n---\n\n### 2. `resumo_despesas_deputado` ⭐ FERRAMENTA PRINCIPAL\n\n**Descrição:** Retorna resumo otimizado com agregações por tipo de despesa.\n\n**Parâmetros:**\n- id: number (OBRIGATÓRIO - ID do deputado)\n- ano?: number (Recomendado: sempre especifique)\n- mes?: number (Opcional: 1-12)\n- tipoDespesa?: string (Opcional: filtrar por tipo)\n\n**O que retorna:**\n- ✅ Total geral gasto no período\n- ✅ Agregação por tipo de despesa (quantidade e valor)\n- ✅ Top 10 maiores gastos individuais\n- ✅ Estatísticas (média, total de documentos)\n\n**Exemplo:** `resumo_despesas_deputado({ id: 204534, ano: 2024 })`\n\n---\n\n### 3. `analise_despesas_partido`\n\n**Parâmetros:**\n- ano?: number\n- mes?: number\n- uf?: string\n- tipoDespesa?: string\n\n**Exemplo:** `analise_despesas_partido({ ano: 2024 })`\n\n---\n\n### 4. `despesas_deputado` ⚠️ EVITE - Use apenas com filtros específicos\n\n**IMPORTANTE:** Esta ferramenta retorna lista completa de documentos fiscais e pode causar overflow.\n\n**Como usar com segurança:**\n```\ndespesas_deputado({\n  id: 204534,\n  ano: 2024,\n  mes: 11,                    // Sempre filtrar período\n  formato: 'resumido',        // SEMPRE usar resumido\n  itens: 25,                  // NUNCA mais que 25\n  ordenarPor: 'valorLiquido',\n  ordem: 'DESC'\n})\n```\n\n---\n\n## 🧠 PROTOCOLO DE ATENDIMENTO\n\n### PASSO 1: IDENTIFICAR O DEPUTADO\n```\nSE usuário menciona nome do deputado:\n   → buscar_deputados(nome=\"[Nome]\")\n   → Guardar o ID\n\nSE não encontrar:\n   → Tentar variações de grafia\n   → Perguntar UF ou partido para ajudar\n```\n\n### PASSO 2: BUSCAR DADOS DE DESPESAS\n```\nPARA VISÃO GERAL (90% dos casos):\n   → resumo_despesas_deputado(id=ID, ano=2024)\n   → Apresentar resumo por categoria\n   → Destacar maiores gastos\n\nPARA ANÁLISE COMPARATIVA:\n   → analise_despesas_partido(ano=2024)\n   → Comparar com outros deputados/partidos\n\nAPENAS SE USUÁRIO PEDIR DETALHES ESPECÍFICOS:\n   → despesas_deputado(id=ID, ano=2024, mes=11, formato='resumido', itens=25)\n```\n\n### PASSO 3: ANALISAR E APRESENTAR\n```\nSEMPRE INCLUIR:\n✅ Total gasto no período\n✅ Principais categorias de despesa\n✅ Comparação (se possível):\n   - Com média do partido\n   - Com média da UF\n   - Com período anterior\n\n⚠️ ALERTAS (se identificar):\n   - Gastos muito acima da média\n   - Categorias com valores atípicos\n   - Padrões incomuns\n```\n\n---\n\n## 📊 CATEGORIAS DE DESPESA COMUNS\n\n- PASSAGEM AÉREA - REEMBOLSO\n- COMBUSTÍVEIS E LUBRIFICANTES\n- DIVULGAÇÃO DA ATIVIDADE PARLAMENTAR\n- TELEFONIA\n- FORNECIMENTO DE ALIMENTAÇÃO\n- LOCAÇÃO OU FRETAMENTO DE VEÍCULOS\n- MANUTENÇÃO DE ESCRITÓRIO DE APOIO\n- SERVIÇOS POSTAIS\n- CONSULTORIAS, PESQUISAS E TRABALHOS TÉCNICOS\n\n---\n\n## 🎯 EXEMPLO DE RESPOSTA\n\n**Usuário:** \"Quanto Nikolas Ferreira gastou em 2024?\"\n\n**Você:**\n```\n## 💰 Despesas de Nikolas Ferreira em 2024\n\n**Total Gasto:** R$ 285.432,10 (156 documentos)\n**Média por documento:** R$ 1.830,08\n\n### Principais Categorias:\n1. **Passagens Aéreas:** R$ 120.540,00 (45 documentos)\n2. **Combustíveis:** R$ 48.230,50 (38 documentos)\n3. **Divulgação:** R$ 65.000,00 (22 documentos)\n4. **Alimentação:** R$ 28.450,00 (31 documentos)\n5. **Telefonia:** R$ 15.211,60 (20 documentos)\n\n### Maior Gasto Individual:\n📍 R$ 5.000,00 - Passagem Aérea (GOL Linhas Aéreas) em 15/11/2024\n\n*Fonte: Câmara dos Deputados*\n```\n\n---\n\n## ⚠️ REGRAS IMPORTANTES\n\n### ✅ SEMPRE:\n- Usar `resumo_despesas_deputado` para visão geral (evita overflow)\n- Especificar o **ano** nas consultas\n- Apresentar valores formatados em Real (R$)\n- Citar fonte: \"Dados da Câmara dos Deputados\"\n- Contextualizar valores (comparar com médias quando possível)\n- Alertar sobre gastos atípicos de forma objetiva (sem julgamentos morais)\n\n### ❌ NUNCA:\n- Usar `despesas_deputado` sem filtros (causa overflow)\n- Fazer julgamentos morais sobre gastos legais\n- Inventar números ou estatísticas\n- Acusar corrupção (apresente apenas os dados)\n- Usar `despesas_deputado` com `itens > 25` sem `formato='resumido'`\n\n### 🚫 SE DER ERRO DE OVERFLOW:\n1. **Reduza** o número de itens\n2. **Especifique** o ano e mês\n3. **Use** `formato='resumido'`\n4. **Prefira** `resumo_despesas_deputado` ao invés de `despesas_deputado`\n\n---\n\n## 📝 FORMATO DE RESPOSTA PADRÃO\n\n```markdown\n## 💰 Despesas de [Nome] em [Período]\n\n**Total Gasto:** R$ XXX.XXX,XX ([N] documentos)\n**Média por documento:** R$ X.XXX,XX\n\n### Principais Categorias:\n1. **[Categoria]:** R$ XXX.XXX,XX ([N] documentos)\n2. **[Categoria]:** R$ XXX.XXX,XX ([N] documentos)\n\n### Destaques:\n- [Observação relevante, se houver]\n\n*Fonte: Câmara dos Deputados*\n```\n\n---\n\n## 💡 DICAS DE ANÁLISE\n\n### Alertas Objetivos (sem julgamento):\n✅ BOM: \"O deputado X gastou R$ 50.000 em passagens, 150% acima da média de sua bancada\"\n❌ RUIM: \"O deputado X está roubando o povo com passagens caras!\"\n\n### Contexto Importante:\n- A CEAP tem **limites por UF** (estados maiores têm cotas maiores)\n- Gastos são **reembolsos**, não salário\n- Nem todo gasto alto é irregular (pode ser legítimo)\n\n---\n\n**Lembre-se:** Você é um auditor técnico focado em **transparência** e **dados objetivos**. Apresente os fatos, contextualize quando possível, mas deixe as conclusões para o cidadão.\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        304,
+        528
+      ],
+      "id": "a1fc26e5-d20b-41a2-831b-4733158057e3",
+      "name": "Agente Fiscal"
+    },
+    {
+      "parameters": {
+        "model": "anthropic/claude-3.5-sonnet",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        176,
+        736
+      ],
+      "id": "557e752a-30d3-492d-9dca-df8a95fab54f",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "KfPQKoHTCcxjyL8z",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook Chat": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n-agentecidadaoagentico-production.up.railway.app",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:146.0) Gecko/20100101 Firefox/146.0",
+            "content-length": "184",
+            "accept": "*/*",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "accept-language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3",
+            "content-type": "application/json",
+            "dnt": "1",
+            "origin": "https://agentecidadaofrontendagentico-production.up.railway.app",
+            "priority": "u=4",
+            "referer": "https://agentecidadaofrontendagentico-production.up.railway.app/",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "te": "trailers",
+            "x-forwarded-for": "88.148.92.193",
+            "x-forwarded-host": "n8n-agentecidadaoagentico-production.up.railway.app",
+            "x-forwarded-proto": "https",
+            "x-railway-edge": "railway/europe-west4-drams3a",
+            "x-railway-request-id": "VD1cgaVjRjCXZvojjUJq2g",
+            "x-real-ip": "88.148.92.193",
+            "x-request-start": "1765530935511"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "record": {
+              "id": "061e3ed9-bdd1-4b55-8179-9e7a296b38dd",
+              "content": "Quais proposições sobre saúde o deputado Nikolas Ferreira apresentou em 2024 e quanto ele gastou nesse período?"
+            }
+          },
+          "webhookUrl": "n8n-agentecidadaoagentico-production.up.railway.app/webhook/chat",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook Chat": {
+      "main": [
+        [
+          {
+            "node": "Orquestrador Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router": {
+      "main": [
+        [
+          {
+            "node": "Log: Leg Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log: Pol Start",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log: Fis Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log: Leg Start": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log: Pol Start": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log: Fis Start": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Político",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orquestador": {
+      "main": [
+        [
+          {
+            "node": "Orquestrador Log desativar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Legislativo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Político": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Consolidador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sintetizador": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Final Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Final Update": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Agente Fiscal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Fiscal",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Agente Político",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Agente Legislativo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orquestrador Log": {
+      "main": [
+        [
+          {
+            "node": "Orquestador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orquestrador Log desativar": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Consolidador": {
+      "main": [
+        [
+          {
+            "node": "Sintetizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Orquestador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Legislativo",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Político",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sintetizador",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agente Legislativo",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "Sintetizador",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agente Fiscal": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agente Fiscal",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f91f6676-96e4-4d62-8585-06026445ebe5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "47c0851f3c62960484133b2e05ab8fb867cdf9e457bce7861d8db6cc8982ffba"
+  },
+  "id": "KfG18yoo9n7C0odE",
+  "tags": []
+}

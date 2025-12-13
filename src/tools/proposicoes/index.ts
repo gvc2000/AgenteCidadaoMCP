@@ -2,6 +2,7 @@ import { buscarProposicoes, buscarProposicoesTool } from './buscar.js';
 import { detalharProposicao, detalharProposicaoTool } from './detalhar.js';
 import { autoresProposicao, autoresProposicaoTool } from './autores.js';
 import { tramitacoesProposicao, tramitacoesProposicaoTool } from './tramitacoes.js';
+import { resumoTramitacaoProposicao, resumoTramitacaoProposicaoTool } from './resumo-tramitacao.js';
 import { votacoesProposicao, votacoesProposicaoTool } from './votacoes.js';
 import { relacionadasProposicao, relacionadasProposicaoTool } from './relacionadas.js';
 import { temasProposicao, temasProposicaoTool } from './temas.js';
@@ -15,6 +16,8 @@ export {
   autoresProposicaoTool,
   tramitacoesProposicao,
   tramitacoesProposicaoTool,
+  resumoTramitacaoProposicao,
+  resumoTramitacaoProposicaoTool,
   votacoesProposicao,
   votacoesProposicaoTool,
   relacionadasProposicao,
@@ -28,6 +31,7 @@ export const proposicoesTools = [
   detalharProposicaoTool,
   autoresProposicaoTool,
   tramitacoesProposicaoTool,
+  resumoTramitacaoProposicaoTool,
   votacoesProposicaoTool,
   relacionadasProposicaoTool,
   temasProposicaoTool

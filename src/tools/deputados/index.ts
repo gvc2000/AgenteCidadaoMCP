@@ -4,6 +4,7 @@ import { obterPerfilCompleto, obterPerfilCompletoTool } from './perfil-completo.
 import { despesasDeputado, despesasDeputadoTool } from './despesas.js';
 import { resumoDespesasDeputado, resumoDespesasDeputadoTool } from './resumo-despesas.js';
 import { discursosDeputado, discursosDeputadoTool } from './discursos.js';
+import { resumoDiscursosDeputado, resumoDiscursosDeputadoTool } from './resumo-discursos.js';
 import { eventosDeputado, eventosDeputadoTool } from './eventos.js';
 import { frentesDeputado, frentesDeputadoTool } from './frentes.js';
 import { ocupacoesDeputado, ocupacoesDeputadoTool } from './ocupacoes.js';
@@ -23,6 +24,8 @@ export {
   resumoDespesasDeputadoTool,
   discursosDeputado,
   discursosDeputadoTool,
+  resumoDiscursosDeputado,
+  resumoDiscursosDeputadoTool,
   eventosDeputado,
   eventosDeputadoTool,
   frentesDeputado,
@@ -42,6 +45,7 @@ export const deputadosTools = [
   despesasDeputadoTool,
   resumoDespesasDeputadoTool,
   discursosDeputadoTool,
+  resumoDiscursosDeputadoTool,
   eventosDeputadoTool,
   frentesDeputadoTool,
   ocupacoesDeputadoTool,

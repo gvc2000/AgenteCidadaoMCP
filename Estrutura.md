@@ -27,9 +27,9 @@ MCP Layer (mcp.ts) → Tools (tools/*) → Core (core/*) → API Client (api/cli
 ```
 ├── api/client.ts, normalizers.ts     # HTTP client, normalização
 ├── core/                              # Cache, rate-limiter, circuit-breaker, metrics, logging, errors, schemas
-├── tools/                             # 60 tools em 11 categorias
-│   ├── deputados/      (11)          # buscar, detalhar, despesas, resumo-despesas, discursos, resumo-discursos, eventos, frentes, ocupacoes, orgaos, profissoes
-│   ├── proposicoes/    (8)           # buscar, detalhar, autores, tramitacoes, resumo-tramitacao, votacoes, relacionadas, temas
+├── tools/                             # 57 tools em 11 categorias
+│   ├── deputados/      (9)           # buscar, detalhar, despesas, discursos, eventos, frentes, ocupacoes, orgaos, profissoes
+│   ├── proposicoes/    (7)           # buscar, detalhar, autores, tramitacoes, votacoes, relacionadas, temas
 │   ├── votacoes/       (5)           # buscar, detalhar, votos, orientacoes, ultimas
 │   ├── eventos/        (6)           # buscar, detalhar, deputados, pauta, votacoes, orgaos
 │   ├── orgaos/         (5)           # buscar, detalhar, membros, eventos, votacoes
@@ -39,7 +39,7 @@ MCP Layer (mcp.ts) → Tools (tools/*) → Core (core/*) → API Client (api/cli
 │   ├── legislaturas/   (3)           # buscar, detalhar, mesa
 │   ├── referencias/    (5)           # situacoes, tipos_proposicao, tipos_orgao, tipos_evento, ufs
 │   └── analises/       (8)           # presenca, ranking, despesas_partido, comparativo, timeline, exportar, sugerir, diagnosticar
-└── utils/                             # aggregators, currency, date, sanitizers, text-summarizer
+└── utils/                             # aggregators, currency, date, sanitizers
 ```
 
 ## Convenções
@@ -177,16 +177,14 @@ Acesso: `import { CONFIG } from './config.js'`
 3. `votos_votacao` → voto de cada deputado
 4. `orientacoes_votacao` → orientação dos partidos
 
-### Tabela Completa de Tools (60)
+### Tabela Completa de Tools (57)
 
 | Categoria | Tool | Quando Usar |
 |-----------|------|-------------|
 | **Deputados** | `buscar_deputados` | Encontrar deputados por nome/UF/partido |
 | | `detalhar_deputado` | Dados completos (requer ID) |
-| | `despesas_deputado` | Gastos da cota parlamentar (lista completa) |
-| | `resumo_despesas_deputado` | ⭐ Resumo otimizado de despesas (evita overflow) |
-| | `discursos_deputado` | Pronunciamentos em plenário (textos completos) |
-| | `resumo_discursos_deputado` | ⭐ Resumo otimizado de discursos (evita overflow) |
+| | `despesas_deputado` | Gastos da cota parlamentar |
+| | `discursos_deputado` | Pronunciamentos em plenário |
 | | `eventos_deputado` | Eventos que participou |
 | | `frentes_deputado` | Frentes parlamentares que integra |
 | | `ocupacoes_deputado` | Histórico de ocupações |
@@ -195,8 +193,7 @@ Acesso: `import { CONFIG } from './config.js'`
 | **Proposições** | `buscar_proposicoes` | Buscar PLs, PECs, MPs por filtros |
 | | `detalhar_proposicao` | Dados completos (requer ID) |
 | | `autores_proposicao` | Quem apresentou |
-| | `tramitacoes_proposicao` | Histórico de tramitação (lista completa) |
-| | `resumo_tramitacao_proposicao` | ⭐ Resumo otimizado de tramitação (eventos-chave) |
+| | `tramitacoes_proposicao` | Histórico de tramitação |
 | | `votacoes_proposicao` | Votações da proposição |
 | | `relacionadas_proposicao` | Proposições relacionadas |
 | | `temas_proposicao` | Temas/assuntos |
@@ -247,15 +244,3 @@ Acesso: `import { CONFIG } from './config.js'`
 **Base**: https://dadosabertos.camara.leg.br/api/v2
 **Docs**: https://dadosabertos.camara.leg.br/swagger/api.html
 **Auth**: Não requerida (API pública)
-
-## Integrações
-
-### Sistema Multi-Agentes n8n
-O servidor MCP é usado como backend de um sistema de orquestração multi-agente no n8n:
-- **Orquestrador**: Roteia perguntas para os agentes especializados
-- **Agente Legislativo**: Proposições e tramitações (Claude 3.5 Sonnet)
-- **Agente Político**: Perfil e atuação parlamentar (Claude 3.5 Sonnet)
-- **Agente Fiscal**: Despesas parlamentares (Claude 3.5 Sonnet)
-- **Sintetizador**: Consolida respostas (Gemini 2.5 Flash)
-
-**Documentação completa:** [docs/n8n/SISTEMA_MULTI_AGENTES.md](./docs/n8n/SISTEMA_MULTI_AGENTES.md)

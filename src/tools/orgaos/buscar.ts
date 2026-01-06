@@ -28,12 +28,37 @@ export async function buscarOrgaos(params: BuscarOrgaosParams = {}) {
     const cached = cacheManager.get<any>('orgaos', cacheKey);
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
 
-    const response = await camaraAPI.getWithPagination('/orgaos', validated);
+    // A API da Câmara NÃO suporta o parâmetro 'nome' (retorna erro 400)
+    // Por isso, extraímos o 'nome' e filtramos localmente após a busca
+    const { nome, ...apiParams } = validated;
+
+    // Se apenas 'nome' foi passado, buscar mais itens para ter resultados para filtrar
+    const searchParams = nome && !validated.sigla
+      ? { ...apiParams, itens: 100 }  // Buscar mais para filtrar
+      : apiParams;
+
+    const response = await camaraAPI.getWithPagination('/orgaos', searchParams);
+
+    // Filtrar por nome localmente (case-insensitive, busca parcial)
+    let orgaosFiltrados = response.dados;
+    if (nome) {
+      const nomeNormalizado = nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      orgaosFiltrados = response.dados.filter((orgao: any) => {
+        const nomeOrgao = (orgao.nome || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const apelidoOrgao = (orgao.apelido || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        return nomeOrgao.includes(nomeNormalizado) || apelidoOrgao.includes(nomeNormalizado);
+      });
+    }
 
     const result = {
-      paginacao: createPaginacaoResposta(validated.pagina || 1, validated.itens || 25, response.dados.length),
-      orgaos: response.dados,
-      _metadata: { cache: false, latencyMs: Date.now() - startTime, apiVersion: 'v2' }
+      paginacao: createPaginacaoResposta(validated.pagina || 1, validated.itens || 25, orgaosFiltrados.length),
+      orgaos: orgaosFiltrados,
+      _metadata: {
+        cache: false,
+        latencyMs: Date.now() - startTime,
+        apiVersion: 'v2',
+        ...(nome ? { filteredByName: true, originalCount: response.dados.length } : {})
+      }
     };
 
     cacheManager.set('orgaos', cacheKey, result);
@@ -49,12 +74,12 @@ export async function buscarOrgaos(params: BuscarOrgaosParams = {}) {
 
 export const buscarOrgaosTool = {
   name: 'buscar_orgaos',
-  description: 'Busca órgãos da Câmara (comissões, mesas, conselhos, etc)',
+  description: 'Busca órgãos da Câmara (comissões, mesas, conselhos, etc). Aceita busca por sigla (ex: CE para Comissão de Educação) ou por nome/apelido (busca parcial, ex: "educação" encontra "Comissão de Educação")',
   inputSchema: {
     type: 'object',
     properties: {
-      sigla: { type: 'string', description: 'Sigla do órgão' },
-      nome: { type: 'string', description: 'Nome do órgão' },
+      sigla: { type: 'string', description: 'Sigla do órgão (ex: CE, CCJC, CFT). PREFERENCIAL se conhecida' },
+      nome: { type: 'string', description: 'Nome ou parte do nome do órgão (busca parcial case-insensitive, ex: "educação", "direitos humanos")' },
       idTipoOrgao: { type: 'number', description: 'ID do tipo de órgão' },
       dataInicio: { type: 'string', description: 'Data de início (YYYY-MM-DD)' },
       dataFim: { type: 'string', description: 'Data de fim (YYYY-MM-DD)' },

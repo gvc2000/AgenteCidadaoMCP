@@ -33,8 +33,9 @@ export async function buscarOrgaos(params: BuscarOrgaosParams = {}) {
     const { nome, ...apiParams } = validated;
 
     // Se apenas 'nome' foi passado, buscar mais itens para ter resultados para filtrar
+    // A Câmara tem mais de 1000 órgãos, então precisamos buscar mais para encontrar comissões específicas
     const searchParams = nome && !validated.sigla
-      ? { ...apiParams, itens: 100 }  // Buscar mais para filtrar
+      ? { ...apiParams, itens: 500 }  // Buscar mais para filtrar (CCTI está além dos 100 primeiros)
       : apiParams;
 
     const response = await camaraAPI.getWithPagination('/orgaos', searchParams);

@@ -10,7 +10,7 @@ const MembrosOrgaoSchema = z.object({
   dataInicio: DateSchema.optional(),
   dataFim: DateSchema.optional(),
   pagina: z.number().int().positive().default(1).optional(),
-  itens: z.number().int().min(1).max(100).default(25).optional()
+  itens: z.number().int().min(1).max(100).default(100).optional()  // Default 100 to get all members
 });
 
 export type MembrosOrgaoParams = z.infer<typeof MembrosOrgaoSchema>;
@@ -28,7 +28,7 @@ export async function membrosOrgao(params: MembrosOrgaoParams) {
     const response = await camaraAPI.getWithPagination(`/orgaos/${id}/membros`, queryParams);
 
     const result = {
-      paginacao: createPaginacaoResposta(validated.pagina || 1, validated.itens || 25, response.dados.length),
+      paginacao: createPaginacaoResposta(validated.pagina || 1, validated.itens || 100, response.dados.length),
       membros: response.dados,
       _metadata: { cache: false, latencyMs: Date.now() - startTime, apiVersion: 'v2' }
     };

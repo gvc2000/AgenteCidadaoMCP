@@ -25,7 +25,8 @@ export async function membrosOrgao(params: MembrosOrgaoParams) {
     if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
 
     const { id, ...queryParams } = validated;
-    const response = await camaraAPI.getWithPagination(`/orgaos/${id}/membros`, queryParams);
+    // SEMPRE enviar itens=100 para garantir que todos os membros sejam retornados
+    const response = await camaraAPI.getWithPagination(`/orgaos/${id}/membros`, { ...queryParams, itens: 100 });
 
     const result = {
       paginacao: createPaginacaoResposta(validated.pagina || 1, validated.itens || 100, response.dados.length),

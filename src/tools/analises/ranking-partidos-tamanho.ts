@@ -25,11 +25,14 @@ interface PartidoRanking {
     } | null;
 }
 
-export async function rankingPartidosTamanho(params: RankingPartidosTamanhoParams = {}) {
+export async function rankingPartidosTamanho(params: RankingPartidosTamanhoParams | any = {}) {
     const startTime = Date.now();
 
     try {
-        const validated = RankingPartidosTamanhoSchema.parse(params);
+        // Defensive: handle [] or null passed by some LLMs
+        const safeParams = (Array.isArray(params) || params === null || params === undefined) ? {} : params;
+
+        const validated = RankingPartidosTamanhoSchema.parse(safeParams);
         const cacheKey = createCacheKey({ tool: 'ranking_partidos_tamanho', ...validated });
         const cached = cacheManager.get<any>('analises', cacheKey);
         if (cached) return { ...cached, _metadata: { ...cached._metadata, cache: true } };
@@ -121,7 +124,7 @@ export async function rankingPartidosTamanho(params: RankingPartidosTamanhoParam
 
 export const rankingPartidosTamanhoTool = {
     name: 'ranking_partidos_tamanho',
-    description: 'Retorna o ranking dos maiores partidos na Câmara por número de deputados. Ideal para perguntas como "Quais os maiores partidos?", "Qual o maior partido?", "Quantos deputados tem cada partido?"',
+    description: 'Retorna o ranking dos maiores partidos na Câmara por número de deputados. Ideal para perguntas como "Quais os maiores partidos?", "Qual o maior partido?", "Quantos deputados tem cada partido?". Chame com {} se não precisar de parâmetros.',
     inputSchema: {
         type: 'object',
         properties: {
@@ -133,7 +136,9 @@ export const rankingPartidosTamanhoTool = {
                 type: 'number',
                 description: 'Quantidade de partidos a retornar (padrão: 15, máx: 30)'
             }
-        }
+        },
+        required: []
     },
     handler: rankingPartidosTamanho
 };
+

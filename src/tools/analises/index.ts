@@ -8,6 +8,7 @@ export { timelineTramitacao, timelineTramitacaoTool } from './timeline-tramitaca
 export { exportarDados, exportarDadosTool } from './exportar-dados.js';
 export { sugerirFerramentas, sugerirFerramentasDefinition } from './sugerir.js';
 export { diagnosticarConsulta, diagnosticarConsultaTool } from './diagnosticar.js';
+export { rankingPartidosTamanho, rankingPartidosTamanhoTool } from './ranking-partidos-tamanho.js';
 
 import { analisePresencaTool } from './analise-presenca.js';
 import { rankingProposicoesTool } from './ranking-proposicoes.js';
@@ -17,6 +18,7 @@ import { timelineTramitacaoTool } from './timeline-tramitacao.js';
 import { exportarDadosTool } from './exportar-dados.js';
 import { sugerirFerramentasDefinition } from './sugerir.js';
 import { diagnosticarConsultaTool } from './diagnosticar.js';
+import { rankingPartidosTamanhoTool } from './ranking-partidos-tamanho.js';
 
 export const analisesTools = [
   analisePresencaTool,
@@ -26,5 +28,6 @@ export const analisesTools = [
   timelineTramitacaoTool,
   exportarDadosTool,
   sugerirFerramentasDefinition,
-  diagnosticarConsultaTool
+  diagnosticarConsultaTool,
+  rankingPartidosTamanhoTool
 ];

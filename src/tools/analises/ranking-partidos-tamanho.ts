@@ -5,6 +5,7 @@ import { logToolCall } from '../../core/logging.js';
 import { metricsCollector } from '../../core/metrics.js';
 
 const RankingPartidosTamanhoSchema = z.object({
+    confirmar: z.boolean().default(true),
     idLegislatura: z.number().int().positive().default(57).optional(),
     limite: z.number().int().min(1).max(30).default(15).optional()
 });
@@ -30,7 +31,7 @@ export async function rankingPartidosTamanho(params: RankingPartidosTamanhoParam
 
     try {
         // Defensive: handle [] or null passed by some LLMs
-        const safeParams = (Array.isArray(params) || params === null || params === undefined) ? {} : params;
+        const safeParams = (Array.isArray(params) || params === null || params === undefined) ? { confirmar: true } : params;
 
         const validated = RankingPartidosTamanhoSchema.parse(safeParams);
         const cacheKey = createCacheKey({ tool: 'ranking_partidos_tamanho', ...validated });
@@ -124,10 +125,14 @@ export async function rankingPartidosTamanho(params: RankingPartidosTamanhoParam
 
 export const rankingPartidosTamanhoTool = {
     name: 'ranking_partidos_tamanho',
-    description: 'Retorna o ranking dos maiores partidos na Câmara por número de deputados. Ideal para perguntas como "Quais os maiores partidos?", "Qual o maior partido?", "Quantos deputados tem cada partido?". Chame com {} se não precisar de parâmetros.',
+    description: 'Retorna o ranking dos maiores partidos na Câmara por número de deputados. Ideal para perguntas como "Quais os maiores partidos?", "Qual o maior partido?", "Quantos deputados tem cada partido?".',
     inputSchema: {
         type: 'object',
         properties: {
+            confirmar: {
+                type: 'boolean',
+                description: 'Sempre passe true para executar a consulta'
+            },
             idLegislatura: {
                 type: 'number',
                 description: 'ID da legislatura (padrão: 57 = 2023-2027)'
@@ -137,8 +142,7 @@ export const rankingPartidosTamanhoTool = {
                 description: 'Quantidade de partidos a retornar (padrão: 15, máx: 30)'
             }
         },
-        required: []
+        required: ['confirmar']
     },
     handler: rankingPartidosTamanho
 };
-

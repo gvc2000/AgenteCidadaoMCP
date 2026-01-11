@@ -258,7 +258,7 @@
       "typeVersion": 3,
       "position": [
         -944,
-        0
+        -144
       ],
       "id": "61a1270e-6994-4816-b839-4736315ea755",
       "name": "Orquestador"
@@ -604,8 +604,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        -1104,
-        304
+        -944,
+        176
       ],
       "id": "f11948b8-9931-4d79-95a0-623b1e9b23ef",
       "name": "OpenRouter Chat Model",
@@ -1125,7 +1125,7 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "97b04904-77da-4164-b3c7-f359674bdfdc",
+  "versionId": "4998eb7b-e3bf-4e27-a54f-682a41a5aba9",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "47c0851f3c62960484133b2e05ab8fb867cdf9e457bce7861d8db6cc8982ffba"

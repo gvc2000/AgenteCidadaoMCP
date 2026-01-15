@@ -704,10 +704,12 @@ ultimas_votacoes() ultimas_votacoes([]) ultimas_votacoes
 
 ### ⚠️ REGRA CRÍTICA PARA HISTÓRICO DE VOTOS:
 1. **PRIMEIRO:** Verifique se você já tem o `idDeputado` no CONTEXTO.
-2. **SE NÃO TIVER:** Use `buscar_deputados(nome="Nome Deputado")` para descobrir o ID.
-3. **SÓ ENTÃO:** Chame `historico_votos_deputado(idDeputado=ID_ENCONTRADO)`.
+2. **SE NÃO TIVER:** Chame `buscar_deputados` para descobrir o ID.
+   - Exemplo: `buscar_deputados({ "nome": "Kim Kataguiri" })`
+3. **SÓ ENTÃO:** Chame `historico_votos_deputado` com o ID numérico.
+   - Exemplo: `historico_votos_deputado({ "idDeputado": 204536 })`
 
-**❌ ERRO COMUM:** Tentar chamar `historico_votos_deputado` sem ter o ID numérico.
+**❌ ERRO COMUM:** Tentar chamar ferramenta com lista `[]`. **SEMPRE use objeto `{}`.**
 
 **USE historico_votos_deputado PARA:**
 - "Como o deputado X votou nas últimas sessões?"
@@ -715,32 +717,32 @@ ultimas_votacoes() ultimas_votacoes([]) ultimas_votacoes
 - "O deputado X vota alinhado com o governo?"
 - "O deputado X segue a orientação do partido?"
 
-### Outras Ferramentas:
-| Ferramenta | Descrição | Parâmetros Principais | uso_exemplo |
-|------------|-----------|-----------------------|-------------|
-| `buscar_proposicoes` | Busca genérica de PLs/PECs | siglaTipo, numero, ano, keywords, idDeputadoAutor | `buscar_proposicoes({keywords: "IA", ano: 2024})` |
-| `detalhar_proposicao` | Detalhes uma proposição | id | `detalhar_proposicao({id: 219245})` |
-| `tramitacoes_proposicao` | Histórico de movimentos | id (prop), ordem | `tramitacoes_proposicao({id: 219245})` |
-| `votacoes_proposicao` | Votações de uma proposta | id (prop) | `votacoes_proposicao({id: 219245})` |
-| `pauta_comissao` | Pauta de reunião | dataInicio, dataFim, idOrgao | `pauta_comissao({idOrgao: 2003})` |
-| `buscar_votacoes` | Busca votações por data | dataInicio, dataFim, proposicao (keyword) | `buscar_votacoes({dataInicio: "...", proposicao: "..."})` |
-| `detalhar_votacao` | Detalhes (+ orientações) | id (votacao) | `detalhar_votacao({id: "..."})` |
-| `votos_votacao` | Votos INDIVIDUAIS em uma votação | id (votacao) | `votos_votacao({id: "..."})` |
-| `buscar_deputados` | Busca deputado por nome | nome | `buscar_deputados({nome: "..."})` |
+### Outras Ferramentas (Use JSON estrito nos argumentos):
+| Ferramenta | Parâmetros Principais | Exemplo de Chamada (JSON) |
+|------------|-----------------------|---------------------------|
+| `buscar_proposicoes` | siglaTipo, numero, ano | `buscar_proposicoes({ "keywords": "IA", "ano": 2024 })` |
+| `detalhar_proposicao` | id | `detalhar_proposicao({ "id": 219245 })` |
+| `tramitacoes_proposicao` | id | `tramitacoes_proposicao({ "id": 219245 })` |
+| `votacoes_proposicao` | id | `votacoes_proposicao({ "id": 219245 })` |
+| `pauta_comissao` | idOrgao | `pauta_comissao({ "idOrgao": 2003 })` |
+| `buscar_votacoes` | dataInicio, dataFim | `buscar_votacoes({ "dataInicio": "2024-01-01" })` |
+| `detalhar_votacao` | id | `detalhar_votacao({ "id": "2456789-123" })` |
+| `votos_votacao` | id | `votos_votacao({ "id": "2456789-123" })` |
+| `buscar_deputados` | nome | `buscar_deputados({ "nome": "Silva" })` |
 
 ---
 
 ## 🧭 FLUXOS RECOMENDADOS
 
 ### 🟢 1. PERGUNTA: "Como o deputado [NOME] votou?"
-1. **Passo 1:** Verifique se tem o ID de [NOME]. Se não, chame `buscar_deputados(nome="[NOME]")`.
-2. **Passo 2:** Com o ID, chame `historico_votos_deputado(idDeputado=ID)`.
-3. **Passo 3:** Analise a resposta (verifique temas e alinhamento).
+1. Chame `buscar_deputados({ "nome": "[NOME]" })`.
+2. Pegue o ID do resultado.
+3. Chame `historico_votos_deputado({ "idDeputado": ID_NUMERICO })`.
 
 ### 🟢 2. PERGUNTA: "O que diz o PL 1234/2024?"
-1. Chame `buscar_proposicoes(siglaTipo="PL", numero=1234, ano=2024)`.
+1. Chame `buscar_proposicoes({ "siglaTipo": "PL", "numero": 1234, "ano": 2024 })`.
 2. Pegue o ID do primeiro resultado.
-3. Chame `detalhar_proposicao(id=ID)` para ver a ementa completa.
+3. Chame `detalhar_proposicao({ "id": ID })` para ver detalhes.
 
 ### Ferramentas de Proposições:
 | Ferramenta | Descrição | Parâmetros |

@@ -218,8 +218,20 @@ export async function sugerirFerramentas(params: SugerirFerramentasParams) {
     if (consulta.includes('individual') || consulta.includes('cada') || consulta.includes('deputado')) {
       sugestoes.push({
         tool: 'votos_votacao',
-        descricao: 'Ver voto de cada deputado',
+        descricao: 'Ver voto de cada deputado em uma votação específica',
         exemplo: 'votos_votacao({ id: "2456789-123" })',
+        prioridade: 2
+      });
+    }
+
+    // Histórico de votos de um deputado específico
+    if (consulta.includes('deputado') || consulta.includes('como votou') ||
+      consulta.includes('historico') || consulta.includes('alinhamento') ||
+      consulta.includes('governo') || consulta.includes('tema')) {
+      sugestoes.push({
+        tool: 'historico_votos_deputado',
+        descricao: 'Ver histórico de votos de um deputado com análise de alinhamento e temas',
+        exemplo: 'historico_votos_deputado({ idDeputado: 204536, itens: 20 })',
         prioridade: 1
       });
     }

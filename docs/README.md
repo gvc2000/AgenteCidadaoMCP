@@ -33,6 +33,10 @@ Esta pasta contém toda a documentação do projeto organizada por categoria.
 - [Descrição de PR](./process/PR_DESCRICAO.md) - Template de descrição de Pull Requests
 - [Instruções de Merge de PR](./process/PR_MERGE_INSTRUCOES.md) - Processo de merge
 
+## ⚠️ Limitações Conhecidas
+
+- [Limitações da API da Câmara](./LIMITACOES_API_CAMARA.md) - Limitações conhecidas da API de dados abertos
+
 ## 🏠 Documentação Principal
 
 - [README](../README.md) - Visão geral do projeto
@@ -40,4 +44,4 @@ Esta pasta contém toda a documentação do projeto organizada por categoria.
 
 ---
 
-**Última atualização**: 2025-12-13
+**Última atualização**: 2026-01-15
